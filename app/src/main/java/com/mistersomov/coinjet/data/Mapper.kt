@@ -90,5 +90,5 @@ private fun formatPrice(price: Double?): String {
             return DecimalFormat("#.0", symbols).format(price)
         }
     }
-    return return DecimalFormat("###.######", symbols).format(price)
+    return DecimalFormat("###.######", symbols).format(price)
 }
