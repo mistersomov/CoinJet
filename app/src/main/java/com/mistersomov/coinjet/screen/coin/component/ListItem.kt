@@ -48,7 +48,7 @@ fun ListItem(
             if (isFavorite.value) {
                 Icon(
                     modifier = Modifier.size(18.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_background),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.favorite),
                     contentDescription = null,
                     tint = CoinJetTheme.colors.yellow
                 )

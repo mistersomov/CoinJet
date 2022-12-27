@@ -1,6 +1,5 @@
 package com.mistersomov.coinjet.screen.coin.view
 
-import android.util.Log
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -23,36 +22,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.mistersomov.coinjet.BuildConfig
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.core_ui.Padding
 import com.mistersomov.coinjet.data.model.Coin
 import com.mistersomov.coinjet.screen.coin.component.ListItem
 import com.mistersomov.coinjet.screen.coin.component.Swipe
-import com.mistersomov.coinjet.utils.asPercentage
 import com.mistersomov.coinjet.screen.coin.model.CoinViewState
+import com.mistersomov.coinjet.utils.asPercentage
 
 @Composable
 fun CoinViewDisplay(
-    padding: Padding,
     viewState: CoinViewState.Display,
     navController: NavController,
 ) {
     val coinList = viewState.coinList
     val listState = rememberLazyListState()
 
-    LazyColumn(state = listState,
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxHeight(1f),
         horizontalAlignment = Alignment.CenterHorizontally,
         userScrollEnabled = true,
     ) {
         items(items = coinList, key = { coin -> coin.id }) { coin ->
-            Swipe(padding = padding) {
-                ListItem(modifier = Modifier.padding(horizontal = padding.horizontal.dp),
-                    content = {
-                        CoinDetails(coin = coin)
-                    }) {
-                }
+            ListItem(modifier = Modifier.padding(horizontal = 6.dp),
+                content = {
+                    CoinDetails(coin = coin)
+                }) {
             }
         }
     }
@@ -60,8 +57,12 @@ fun CoinViewDisplay(
 
 @Composable
 fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
+    val imageModel by remember { mutableStateOf(coin.imageUrl) }
+    val name by remember { mutableStateOf(coin.name) }
+    val fullName by remember { mutableStateOf(coin.fullName) }
+
     AsyncImage(
-        model = coin.imageUrl,
+        model = imageModel,
         modifier = Modifier
             .padding(start = if (isFavorite) 10.dp else 0.dp)
             .size(32.dp)
@@ -83,13 +84,13 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
         ) {
             Row {
                 Text(
-                    text = coin.name,
+                    text = name,
                     color = CoinJetTheme.colors.onSurface,
                     style = CoinJetTheme.typography.titleMedium,
                 )
                 Text(
                     modifier = Modifier
-                        .padding(start = 1.dp)
+                        .padding(start = 2.dp)
                         .align(Alignment.Bottom),
                     text = "/" + coin.toSymbol,
                     color = CoinJetTheme.colors.onSurfaceVariant,
@@ -99,7 +100,7 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
             }
 
             Text(
-                text = coin.fullName,
+                text = fullName,
                 color = CoinJetTheme.colors.onSurfaceVariant,
                 style = CoinJetTheme.typography.bodySmall,
                 maxLines = 1
@@ -119,7 +120,7 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = coin.price.toString(),
+                    text = coin.price,
                     color = animatePriceColor(price = coin.price.toDouble()),
                     style = CoinJetTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -128,7 +129,8 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
                 )
                 PercentChanging(
                     modifier = Modifier.padding(start = 6.dp),
-                    percent = remember { mutableStateOf(coin.changepct24hour.toDouble()) })
+                    percent = coin.changepct24hour.toDouble(),
+                )
             }
             Text(
                 text = lastUpdate,
@@ -144,17 +146,19 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
 @Composable
 fun PercentChanging(
     modifier: Modifier = Modifier,
-    percent: MutableState<Double>,
+    percent: Double,
 ) {
-    val backgroundColor = if (percent.value == 0.0) {
+    val percentValue by remember { mutableStateOf(percent) }
+
+    val backgroundColor = if (percentValue == 0.0) {
         CoinJetTheme.colors.surfaceVariant
-    } else if (percent.value > 0) {
+    } else if (percent > 0) {
         CoinJetTheme.colors.green
     } else CoinJetTheme.colors.errorContainer
 
-    val textColor = if (percent.value == 0.0) {
+    val textColor = if (percentValue == 0.0) {
         CoinJetTheme.colors.onSurfaceVariant
-    } else if (percent.value > 0) {
+    } else if (percentValue > 0) {
         CoinJetTheme.colors.onGreen
     } else CoinJetTheme.colors.error
 
@@ -171,7 +175,7 @@ fun PercentChanging(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
-            text = "${percent.value.asPercentage()}%",
+            text = "${percent.asPercentage()}%",
             color = textColor,
             style = CoinJetTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
@@ -182,11 +186,11 @@ fun PercentChanging(
 
 @Composable
 fun animatePriceColor(price: Double): Color {
-    val previousPrice = remember { mutableStateOf(price) }
+    val previousPrice by remember { mutableStateOf(price) }
     val initialColor = CoinJetTheme.colors.onSurface
-    val targetColor = if (price == previousPrice.value) {
+    val targetColor = if (price == previousPrice) {
         initialColor
-    } else if (price > previousPrice.value) {
+    } else if (price > previousPrice) {
         CoinJetTheme.colors.onGreen
     } else {
         CoinJetTheme.colors.error
