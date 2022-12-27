@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.component
+package com.mistersomov.coinjet.core_ui.effect
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 
 @Composable
-fun ShimmerEffect(
+fun Shimmer(
     containerHeight: Dp,
 ) {
 

@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.component
+package com.mistersomov.coinjet.core_ui.effect
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -14,7 +14,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
-import com.mistersomov.coinjet.core_ui.Padding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun Swipe(
     modifier: Modifier = Modifier,
-    padding: Padding,
     scope: CoroutineScope = rememberCoroutineScope(),
     content: @Composable () -> Unit
 ) {
@@ -63,7 +61,8 @@ fun Swipe(
             modifier = modifier
                 .background(color = CoinJetTheme.colors.surface)
                 .fillMaxSize()
-                .padding(start = (2 * padding.start).dp, end = (2 * padding.end).dp),
+                //.padding(start = (2 * padding.start).dp, end = (2 * padding.end).dp)
+            ,
             contentAlignment = alignment
         ) {
             Row(
