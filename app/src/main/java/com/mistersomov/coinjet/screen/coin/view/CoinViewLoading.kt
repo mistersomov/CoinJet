@@ -9,22 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.mistersomov.coinjet.core_ui.Padding
-import com.mistersomov.coinjet.screen.coin.component.ListItem
-import com.mistersomov.coinjet.screen.coin.component.ShimmerEffect
+import com.mistersomov.coinjet.core_ui.component.ListItem
+import com.mistersomov.coinjet.core_ui.effect.Shimmer
 
 @Composable
-fun CoinViewLoading(
-    padding: Padding = Padding(start = 6, top = 6, end = 6),
-) {
-    LazyColumn {
+fun CoinViewLoading() {
+    LazyColumn(contentPadding = PaddingValues(horizontal = 6.dp)) {
         items(10) {
-            ListItem(modifier = Modifier.padding(
-                start = padding.start.dp,
-                top = padding.top.dp,
-                end = padding.end.dp,
-                bottom = padding.bottom.dp
-            ),
+            ListItem(
                 isLoading = true,
                 content = {
                     LoadingFields()
@@ -40,7 +32,7 @@ fun LoadingFields() {
             .size(32.dp)
             .clip(CircleShape)
     ) {
-        ShimmerEffect(containerHeight = 32.dp)
+        Shimmer(containerHeight = 32.dp)
     }
     Row(
         modifier = Modifier
@@ -59,7 +51,7 @@ fun LoadingFields() {
                     .height(24.dp)
                     .clip(RoundedCornerShape(24.dp))
             ) {
-                ShimmerEffect(containerHeight = 32.dp)
+                Shimmer(containerHeight = 32.dp)
             }
             Box(
                 modifier = Modifier
@@ -68,7 +60,7 @@ fun LoadingFields() {
                     .height(16.dp)
                     .clip(RoundedCornerShape(24.dp))
             ) {
-                ShimmerEffect(containerHeight = 32.dp)
+                Shimmer(containerHeight = 32.dp)
             }
         }
         Column(
@@ -82,7 +74,7 @@ fun LoadingFields() {
                     .height(24.dp)
                     .clip(RoundedCornerShape(24.dp))
             ) {
-                ShimmerEffect(containerHeight = 32.dp)
+                Shimmer(containerHeight = 32.dp)
             }
             Box(
                 modifier = Modifier
@@ -91,7 +83,7 @@ fun LoadingFields() {
                     .height(16.dp)
                     .clip(RoundedCornerShape(24.dp))
             ) {
-                ShimmerEffect(containerHeight = 32.dp)
+                Shimmer(containerHeight = 32.dp)
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.component
+package com.mistersomov.coinjet.core_ui.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
