@@ -1,5 +1,6 @@
 package com.mistersomov.coinjet.screen.coin.view.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,7 +58,7 @@ fun ViewSearchResult(
             }
             Text(
                 text = stringResource(id = stringId),
-                color = CoinJetTheme.colors.onSurfaceVariant,
+                color = CoinJetTheme.colors.surfaceVariant,
                 style = CoinJetTheme.typography.titleMedium
             )
             if (recentSearchList.isNotEmpty()) {
@@ -67,7 +68,7 @@ fun ViewSearchResult(
                 ) {
                     Text(
                         text = stringResource(id = R.string.crypto_search_clear_cache),
-                        color = CoinJetTheme.colors.primary
+                        color = CoinJetTheme.colors.onPrimary
                     )
                 }
             }
@@ -85,22 +86,22 @@ fun ViewSearchResult(
             ) {
                 Text(
                     text = stringResource(id = R.string.crypto_search_category_fullname),
-                    color = CoinJetTheme.colors.onSurfaceVariant,
+                    color = CoinJetTheme.colors.surfaceVariant,
                     style = CoinJetTheme.typography.labelSmall
                 )
                 Text(
                     text = stringResource(id = R.string.crypto_search_category_name),
-                    color = CoinJetTheme.colors.onSurfaceVariant,
+                    color = CoinJetTheme.colors.surfaceVariant,
                     style = CoinJetTheme.typography.labelSmall
                 )
                 Text(
                     text = stringResource(id = R.string.crypto_search_category_price),
-                    color = CoinJetTheme.colors.onSurfaceVariant,
+                    color = CoinJetTheme.colors.surfaceVariant,
                     style = CoinJetTheme.typography.labelSmall
                 )
                 Text(
                     text = stringResource(id = R.string.crypto_search_category_24h_changes),
-                    color = CoinJetTheme.colors.onSurfaceVariant,
+                    color = CoinJetTheme.colors.surfaceVariant,
                     style = CoinJetTheme.typography.labelSmall
                 )
             }
@@ -108,7 +109,7 @@ fun ViewSearchResult(
             Text(
                 modifier = Modifier.padding(vertical = 10.dp),
                 text = stringResource(id = R.string.crypto_search_headline_title_empty_list),
-                color = CoinJetTheme.colors.onSurfaceVariant,
+                color = CoinJetTheme.colors.surfaceVariant,
                 style = CoinJetTheme.typography.titleSmall
             )
         }
@@ -159,17 +160,17 @@ fun CoinSearchDetails(
         ) {
             Text(
                 text = coin?.fullName ?: "null",
-                color = CoinJetTheme.colors.onSurface,
+                color = CoinJetTheme.colors.onPrimary,
                 style = CoinJetTheme.typography.titleMedium,
             )
             Text(
                 text = coin?.name ?: "null",
-                color = CoinJetTheme.colors.onSurface,
+                color = CoinJetTheme.colors.onPrimary,
                 style = CoinJetTheme.typography.titleSmall,
             )
             Text(
                 text = coin?.price?.toString() ?: "null",
-                color = CoinJetTheme.colors.onSurface,
+                color = CoinJetTheme.colors.onPrimary,
                 style = CoinJetTheme.typography.titleMedium,
             )
             PercentChanging(percent = coin?.changepct24hour?.toDouble() ?: 0.0)

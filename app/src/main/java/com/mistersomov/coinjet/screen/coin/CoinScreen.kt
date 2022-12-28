@@ -42,7 +42,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
         scaffoldState = scaffoldState,
         appBar = { },
         frontLayerScrimColor = Color.Unspecified,
-        backLayerBackgroundColor = CoinJetTheme.colors.background,
+        backLayerBackgroundColor = CoinJetTheme.colors.primary,
         peekHeight = 80.dp,
         backLayerContent = {
             Search(
@@ -71,7 +71,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
             )
         },
         frontLayerElevation = 20.dp,
-        frontLayerBackgroundColor = CoinJetTheme.colors.background,
+        frontLayerBackgroundColor = CoinJetTheme.colors.surface,
         frontLayerContent = {
             when (val currentState = viewState.value) {
                 is CoinViewState.Loading -> CoinViewLoading()

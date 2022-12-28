@@ -140,7 +140,7 @@ fun Search(
                         ),
                     text = stringResource(id = R.string.cancel),
                     style = CoinJetTheme.typography.titleMedium,
-                    color = CoinJetTheme.colors.primary
+                    color = CoinJetTheme.colors.onPrimary
                 )
             }
         }
