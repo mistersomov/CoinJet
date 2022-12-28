@@ -2,6 +2,7 @@ package com.mistersomov.coinjet.data.database.dao
 
 import androidx.room.*
 import com.mistersomov.coinjet.data.database.entity.CoinEntity
+import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,6 +19,12 @@ interface CoinDao {
 
     @Query("SELECT * from ${CoinEntity.TABLE_COIN_NAME} WHERE id == :id LIMIT 1")
     fun getById(id: String): Flow<CoinEntity>
+
+    @Query(
+        "SELECT * FROM ${CoinEntity.TABLE_COIN_NAME} " +
+                "WHERE name LIKE :query OR fullName LIKE :query "
+    )
+    suspend fun getAllByName(query: String): List<CoinEntity>
 
     @Query("DELETE from ${CoinEntity.TABLE_COIN_NAME}")
     suspend fun deleteAll()

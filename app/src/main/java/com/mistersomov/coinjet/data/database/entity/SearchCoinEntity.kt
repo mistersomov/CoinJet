@@ -3,8 +3,8 @@ package com.mistersomov.coinjet.data.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = CoinEntity.TABLE_COIN_NAME)
-data class CoinEntity(
+@Entity(tableName = SearchCoinEntity.TABLE_SEARCH_COIN_NAME)
+data class SearchCoinEntity(
     @PrimaryKey
     val id: String,
     val name: String,
@@ -25,6 +25,6 @@ data class CoinEntity(
 ) {
 
     companion object {
-        const val TABLE_COIN_NAME = "coin_entity"
+        const val TABLE_SEARCH_COIN_NAME = "search_coin_entity"
     }
 }

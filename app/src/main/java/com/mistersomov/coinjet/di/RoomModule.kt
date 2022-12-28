@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.mistersomov.coinjet.data.database.CoinjetDatabase
 import com.mistersomov.coinjet.data.database.dao.CoinDao
+import com.mistersomov.coinjet.data.database.dao.SearchCoinDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +31,8 @@ object RoomModule {
     @Singleton
     @Provides
     fun provideCoinDao(database: CoinjetDatabase): CoinDao = database.coinDao()
+
+    @Singleton
+    @Provides
+    fun provideSearchDao(database: CoinjetDatabase): SearchCoinDao = database.searchDao()
 }
