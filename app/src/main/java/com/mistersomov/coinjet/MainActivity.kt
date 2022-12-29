@@ -1,9 +1,19 @@
 package com.mistersomov.coinjet
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.core_ui.MainTheme
 import com.mistersomov.coinjet.screen.coin.CoinScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,9 +23,40 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainTheme() {
+            MainTheme {
+                SetOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                SetSystemUiController()
+
                 CoinScreen(navController = rememberNavController())
             }
         }
     }
+}
+
+@Composable
+fun SetSystemUiController() {
+    val systemUiController = rememberSystemUiController()
+    val statusBarColor = CoinJetTheme.colors.primary
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = statusBarColor
+        )
+    }
+}
+
+@Composable
+fun SetOrientation(orientation: Int) {
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = orientation
+        onDispose { activity.requestedOrientation = originalOrientation }
+    }
+}
+
+private fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
