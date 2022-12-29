@@ -3,6 +3,7 @@ package com.mistersomov.coinjet.data
 import com.google.gson.Gson
 import com.mistersomov.coinjet.BuildConfig
 import com.mistersomov.coinjet.data.database.entity.CoinEntity
+import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
 import com.mistersomov.coinjet.data.model.Coin
 import com.mistersomov.coinjet.data.network.model.CoinListDto
 import com.mistersomov.coinjet.data.network.model.QuoteDto
@@ -103,6 +104,48 @@ fun Coin.toCoinEntity(): CoinEntity = with(this) {
 }
 
 fun CoinEntity.toCoin(): Coin = with(this) {
+    Coin(
+        id = id,
+        name = name,
+        fullName = fullName,
+        fromSymbol = fromSymbol,
+        toSymbol = toSymbol,
+        price = price,
+        lastUpdate = lastUpdate,
+        volume24hour = volume24hour,
+        volume24hourto = volume24hourto,
+        mktCap = mktCap,
+        open24hour = open24hour,
+        high24hour = high24hour,
+        low24hour = low24hour,
+        changepct24hour = changepct24hour,
+        changepcthour = changepcthour,
+        imageUrl = imageUrl
+    )
+}
+
+fun Coin.toSearchCoinEntity(): SearchCoinEntity = with(this) {
+    SearchCoinEntity(
+        id = id,
+        name = name,
+        fullName = fullName,
+        fromSymbol = fromSymbol,
+        toSymbol = toSymbol,
+        price = price,
+        lastUpdate = lastUpdate,
+        volume24hour = volume24hour,
+        volume24hourto = volume24hourto,
+        mktCap = mktCap,
+        open24hour = open24hour,
+        high24hour = high24hour,
+        low24hour = low24hour,
+        changepct24hour = changepct24hour,
+        changepcthour = changepcthour,
+        imageUrl = imageUrl
+    )
+}
+
+fun SearchCoinEntity.toCoin(): Coin = with(this) {
     Coin(
         id = id,
         name = name,
