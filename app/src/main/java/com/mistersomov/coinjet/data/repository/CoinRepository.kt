@@ -8,6 +8,8 @@ import com.mistersomov.coinjet.data.toCoinEntity
 import com.mistersomov.coinjet.data.toSearchCoinEntity
 import com.mistersomov.coinjet.di.qualifier.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,41 +23,46 @@ class CoinRepository @Inject constructor(
         .onEach { coinList -> saveCoinListToCache(coinList) }
         .flowOn(defaultDispatcher)
 
-    suspend fun searchCoin(query: String): List<Coin> {
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun searchCoin(query: String): Flow<List<Coin>> {
         val formattedQuery = buildString {
             append("%")
             append(query)
             append("%")
         }
-        return getSpecificCoinListFromCache(formattedQuery)
 
-//        return when {
-//            query.isBlank() -> flow {
-//                    getSearchList().collect {
-//                        emit(it)
-//                    }
-//                }
-//                    .map { list: List<Coin> ->
-//                        when {
-//                            list.isEmpty() -> emptyList()
-//                            else -> list
-//                        }
-//                    }
-//                    .flowOn(defaultDispatcher)
-//
-//            else -> flow {
-//                    getSpecificCoinListFromCache(formattedQuery).collect {
-//                        emit(it)
-//                    }
-//                }
-//                    .map {
-//                        when {
-//                            it.isEmpty() -> emptyList()
-//                            else -> it
-//                        }
-//                    }
-//                    .flowOn(defaultDispatcher)
-//            }
+        return when {
+            query.isBlank() -> getSearchList().mapLatest { list: List<Coin> ->
+                when {
+                    list.isEmpty() -> emptyList()
+                    else -> list.sortedByDescending { coin -> coin.price.toDouble() }
+                }
+            }
+                .flowOn(defaultDispatcher)
+
+            else -> merge(getSearchSpecificCoinList(formattedQuery), getSpecificCoinListFromCache(
+                formattedQuery
+            )).mapLatest {
+                when {
+                    it.isEmpty() -> emptyList()
+                    else -> it.sortedByDescending { coin -> coin.price.toDouble() }
+                }
+            }
+                .debounce(300)
+                .flowOn(defaultDispatcher)
+        }
+    }
+
+    suspend fun saveSearchCoinToCache(coin: Coin) = withContext(defaultDispatcher) {
+        localDataSource.saveSearchCoinToCache(coin.toSearchCoinEntity())
+    }
+
+    fun getSearchList(): Flow<List<Coin>> = localDataSource.getRecentSearchList()
+        .map { entityList -> entityList.map { entity -> entity.toCoin() } }
+        .flowOn(defaultDispatcher)
+
+    suspend fun clearSearchList() = withContext(defaultDispatcher) {
+        localDataSource.clearSearchList()
     }
 
     private suspend fun saveCoinListToCache(coinList: List<Coin>) {
@@ -71,28 +78,17 @@ class CoinRepository @Inject constructor(
             .flowOn(defaultDispatcher)
     }
 
-    private suspend fun getSpecificCoinListFromCache(query: String): List<Coin> =
-        withContext(defaultDispatcher) {
-            localDataSource.getSpecificCoinList(query).map { entity -> entity.toCoin() }
-        }
+    private fun getSpecificCoinListFromCache(query: String): Flow<List<Coin>> =
+        localDataSource.getSpecificCoinList(query)
+            .map { entityList -> entityList.map { entity -> entity.toCoin() } }
+            .flowOn(defaultDispatcher)
 
     private suspend fun clearCache() = withContext(defaultDispatcher) {
         localDataSource.deleteCoinListFromCache()
     }
 
-    suspend fun saveSearchCoinToCache(coin: Coin) = withContext(defaultDispatcher) {
-        localDataSource.saveSearchCoinToCache(coin.toSearchCoinEntity())
-    }
-
-    fun getSearchList(): Flow<List<Coin>> = localDataSource.getRecentSearchList()
-        .map { searchList -> searchList.map { entity -> entity.toCoin() } }
-        .flowOn(defaultDispatcher)
-
-
-    private suspend fun getSearchSpecificCoinList(query: String): List<Coin> =
-        localDataSource.getRecentSearchSpecificCoinList(query).map { entity -> entity.toCoin() }
-
-    suspend fun clearSearchList() = withContext(defaultDispatcher) {
-        localDataSource.clearSearchList()
-    }
+    private fun getSearchSpecificCoinList(query: String): Flow<List<Coin>> =
+        localDataSource.getRecentSearchSpecificCoinList(query).map { entityList ->
+            entityList.map { entity -> entity.toCoin() }
+        }
 }

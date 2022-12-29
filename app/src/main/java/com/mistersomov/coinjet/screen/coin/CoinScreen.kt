@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -22,7 +23,7 @@ import com.mistersomov.coinjet.screen.coin.model.SearchEvent
 import com.mistersomov.coinjet.screen.coin.model.SearchViewState
 import com.mistersomov.coinjet.screen.coin.view.CoinViewDisplay
 import com.mistersomov.coinjet.screen.coin.view.CoinViewLoading
-import com.mistersomov.coinjet.screen.coin.view.search.ViewSearchResult
+import com.mistersomov.coinjet.screen.coin.view.search.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -51,15 +52,30 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 placeholderText = stringResource(id = R.string.crypto_search_placeholder),
                 resultContent = {
-                    when (val currentSearchState = searchViewState.value) {
-                        is SearchViewState.Hide -> Unit
-                        is SearchViewState.Display -> ViewSearchResult(
-                            viewState = currentSearchState,
-                            onItemClicked = { viewModel.obtainSearchEvent(SearchEvent.SaveCoin(it)) },
-                        ) {
-                            viewModel.obtainSearchEvent(SearchEvent.ClearCache)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        when (val currentSearchState = searchViewState.value) {
+                            is SearchViewState.Hide -> Unit
+                            is SearchViewState.NoItems -> SearchViewNoItems()
+                            is SearchViewState.FirstSearch -> SearchViewFirst()
+                            is SearchViewState.Recent -> SearchViewRecent(
+                                viewState = currentSearchState,
+                                onItemClicked = { },
+                                onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
+                            )
+                            is SearchViewState.Global -> SearchViewGlobal(
+                                viewState = currentSearchState,
+                                onItemClicked = {
+                                    viewModel.obtainSearchEvent(
+                                        SearchEvent.SaveCoin(it)
+                                    )
+                                })
                         }
-                        else -> Unit
                     }
                 },
                 onFocusChanged = {
@@ -67,7 +83,8 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                     scope.launch { scaffoldState.reveal() }
                 },
                 onValueChanged = { viewModel.obtainSearchEvent(SearchEvent.LaunchSearch(it)) },
-                onCancelClicked = { viewModel.completeJob() }
+                onCancelClicked = { viewModel.cancelJob() },
+                onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.SearchClick) },
             )
         },
         frontLayerElevation = 20.dp,

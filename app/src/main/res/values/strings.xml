@@ -6,7 +6,8 @@
     <!--Search-->
     <string name="crypto_search_headline_title">Cryptoassets</string>
     <string name="crypto_search_headline_title_recent_searches">Recent Searches</string>
-    <string name="crypto_search_headline_title_empty_list">Find the first cryptoasset</string>
+    <string name="crypto_search_headline_title_first_search">Find something</string>
+    <string name="crypto_search_headline_title_no_items">No matches found</string>
     <string name="crypto_search_category_fullname">Full Name</string>
     <string name="crypto_search_category_name">Name</string>
     <string name="crypto_search_category_price">Price</string>

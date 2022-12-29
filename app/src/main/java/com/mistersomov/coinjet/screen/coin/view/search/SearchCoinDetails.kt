@@ -1,0 +1,71 @@
+package com.mistersomov.coinjet.screen.coin.view.search
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.mistersomov.coinjet.core_ui.CoinJetTheme
+import com.mistersomov.coinjet.data.model.Coin
+import com.mistersomov.coinjet.screen.coin.view.PercentChanging
+
+@Composable
+fun SearchCoinDetails(
+    modifier: Modifier = Modifier,
+    coin: Coin?,
+    onItemClicked: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onItemClicked.invoke() }
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = coin?.imageUrl,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .size(32.dp)
+                .clip(CircleShape),
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = coin?.fullName ?: "null",
+                color = CoinJetTheme.colors.onPrimary,
+                style = CoinJetTheme.typography.titleMedium,
+            )
+            Text(
+                text = coin?.name ?: "null",
+                color = CoinJetTheme.colors.onPrimary,
+                style = CoinJetTheme.typography.titleSmall,
+            )
+            Text(
+                text = coin?.price?.toString() ?: "null",
+                color = CoinJetTheme.colors.onPrimary,
+                style = CoinJetTheme.typography.titleMedium,
+            )
+            PercentChanging(percent = coin?.changepct24hour?.toDouble() ?: 0.0)
+        }
+    }
+}

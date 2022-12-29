@@ -44,6 +44,7 @@ fun Search(
     onFocusChanged: () -> Unit,
     onValueChanged: (String) -> Unit,
     onCancelClicked: () -> Unit,
+    onRemoveQuery: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val text = rememberSaveable { mutableStateOf("") }
@@ -67,8 +68,10 @@ fun Search(
                     .weight(weight = if (!isExpanded.value) 0.5f else 1f)
                     .focusRequester(focusRequester)
                     .onFocusChanged {
-                        isExpanded.value = it.isFocused
-                        onFocusChanged.invoke()
+                        scope.launch {
+                            isExpanded.value = it.isFocused
+                            onFocusChanged.invoke()
+                        }
                     },
                 value = text.value,
                 onValueChange = {
@@ -97,7 +100,10 @@ fun Search(
                             },
                                 indication = null,
                                 onClick = {
-                                    text.value = ""
+                                    scope.launch {
+                                        text.value = ""
+                                        onRemoveQuery.invoke()
+                                    }
                                 }
                             ),
                             imageVector = ImageVector.vectorResource(id = R.drawable.close_circle),
@@ -133,9 +139,11 @@ fun Search(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {
-                                text.value = ""
-                                focusManager.clearFocus(force = true)
-                                onCancelClicked.invoke()
+                                scope.launch {
+                                    text.value = ""
+                                    focusManager.clearFocus(force = true)
+                                    onCancelClicked.invoke()
+                                }
                             }
                         ),
                     text = stringResource(id = R.string.cancel),
@@ -159,7 +167,8 @@ fun PreviewSearch() {
             resultContent = { },
             onFocusChanged = {},
             onValueChanged = {},
-            onCancelClicked = {}
+            onCancelClicked = {},
+            onRemoveQuery = {  }
         )
     }
 }

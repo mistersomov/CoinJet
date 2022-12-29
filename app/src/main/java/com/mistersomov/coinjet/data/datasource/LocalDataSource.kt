@@ -22,9 +22,8 @@ class LocalDataSource @Inject constructor(
 
     fun getCoinListFromCache(): Flow<List<CoinEntity>> = coinDao.getAll().flowOn(ioDispatcher)
 
-    suspend fun getSpecificCoinList(query: String): List<CoinEntity> = withContext(ioDispatcher) {
-        coinDao.getAllByName(query)
-    }
+    fun getSpecificCoinList(query: String): Flow<List<CoinEntity>> =
+        coinDao.getAllByName(query).flowOn(ioDispatcher)
 
     suspend fun deleteCoinListFromCache() = withContext(ioDispatcher) {
         coinDao.deleteAll()
@@ -37,10 +36,8 @@ class LocalDataSource @Inject constructor(
     fun getRecentSearchList(): Flow<List<SearchCoinEntity>> =
         searchCoinDao.getAll().flowOn(ioDispatcher)
 
-    suspend fun getRecentSearchSpecificCoinList(query: String): List<SearchCoinEntity> =
-        withContext(ioDispatcher) {
-            searchCoinDao.getAllByName(query)
-        }
+    fun getRecentSearchSpecificCoinList(query: String): Flow<List<SearchCoinEntity>> =
+        searchCoinDao.getAllByName(query).flowOn(ioDispatcher)
 
     suspend fun clearSearchList() = withContext(ioDispatcher) {
         searchCoinDao.deleteAll()

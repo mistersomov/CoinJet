@@ -6,5 +6,11 @@ sealed class SearchViewState {
 
     object Hide : SearchViewState()
 
-    data class Display(val searchList: List<Coin>) : SearchViewState()
+    object FirstSearch : SearchViewState()
+
+    object NoItems : SearchViewState()
+
+    data class Recent(val recentSearchList: List<Coin>) : SearchViewState()
+
+    data class Global(val globalSearchList: List<Coin>) : SearchViewState()
 }

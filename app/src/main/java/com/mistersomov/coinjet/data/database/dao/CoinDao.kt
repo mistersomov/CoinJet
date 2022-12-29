@@ -24,7 +24,7 @@ interface CoinDao {
         "SELECT * FROM ${CoinEntity.TABLE_COIN_NAME} " +
                 "WHERE name LIKE :query OR fullName LIKE :query "
     )
-    suspend fun getAllByName(query: String): List<CoinEntity>
+    fun getAllByName(query: String): Flow<List<CoinEntity>>
 
     @Query("DELETE from ${CoinEntity.TABLE_COIN_NAME}")
     suspend fun deleteAll()
