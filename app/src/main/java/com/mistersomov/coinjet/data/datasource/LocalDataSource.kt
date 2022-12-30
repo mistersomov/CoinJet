@@ -22,6 +22,8 @@ class LocalDataSource @Inject constructor(
 
     fun getCoinListFromCache(): Flow<List<CoinEntity>> = coinDao.getAll().flowOn(ioDispatcher)
 
+    fun getCoinById(coinId: String): Flow<CoinEntity> = coinDao.getById(coinId).flowOn(ioDispatcher)
+
     fun getSpecificCoinList(query: String): Flow<List<CoinEntity>> =
         coinDao.getAllByName(query).flowOn(ioDispatcher)
 

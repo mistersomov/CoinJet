@@ -26,8 +26,19 @@ class MainActivity : ComponentActivity() {
             MainTheme {
                 SetOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 SetSystemUiController()
+                val navController = rememberNavController()
 
-                CoinScreen(navController = rememberNavController())
+                CoinScreen(navController = navController)
+                //Surface(modifier = Modifier.background(CoinJetTheme.colors.surface)) {
+//                    NavHost(navController = navController, startDestination = "coin") {
+//                        composable(route = "coin") {
+//                            CoinScreen(navController = navController)
+//                        }
+//                        composable(route = "coin_details") {
+//                            CoinViewDetails()
+//                        }
+//                    }
+//                }
             }
         }
     }
