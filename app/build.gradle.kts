@@ -98,6 +98,10 @@ dependencies {
     debugImplementation(Dependencies.Compose.tooling)
     androidTestImplementation(Dependencies.Compose.uiJUnit)
     /**
+     * Navigation
+     */
+    implementation(Dependencies.Navigation.navigation)
+    /**
      * Dagger2
      */
     implementation(Dependencies.Dagger2.dagger)
