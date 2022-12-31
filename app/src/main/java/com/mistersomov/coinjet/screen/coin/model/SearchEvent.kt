@@ -4,6 +4,8 @@ import com.mistersomov.coinjet.data.model.Coin
 
 sealed class SearchEvent {
 
+    object Hide : SearchEvent()
+
     object SearchClick : SearchEvent()
 
     data class LaunchSearch(val query: String) : SearchEvent()

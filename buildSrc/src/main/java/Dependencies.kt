@@ -27,6 +27,12 @@ object Dependencies {
         const val accompanist = "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
     }
 
+    object Navigation {
+        private const val navVersion = "2.5.3"
+
+        const val navigation = "androidx.navigation:navigation-compose:$navVersion"
+    }
+
     object Dagger2 {
         private const val daggerVersion = "2.41"
 

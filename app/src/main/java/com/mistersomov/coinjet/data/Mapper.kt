@@ -46,16 +46,16 @@ fun mapResponseToCoinList(quoteList: List<QuoteDto>, coinListDto: CoinListDto): 
         val fullName = coin.coin?.fullName ?: EMPTY_STRING
         val fromSymbol = quote.fromSymbol ?: EMPTY_STRING
         val toSymbol = quote.toSymbol ?: EMPTY_STRING
-        val price = formatPrice(quote.price)
+        val price = formatCurrency(quote.price ?: 0.0)
         val lastUpdate = quote.lastUpdate.convertTime()
-        val volume24hour = quote.volume24hour?.toString() ?: EMPTY_STRING
-        val volume24hourto = quote.volume24hourto?.toString() ?: EMPTY_STRING
-        val open24hour = quote.open24hour?.toString() ?: EMPTY_STRING
-        val high24hour = quote.high24hour?.toString() ?: EMPTY_STRING
-        val low24hour = quote.low24hour?.toString() ?: EMPTY_STRING
+        val volume24hour = formatBigDecimals(quote.volume24hour ?: 0.0)
+        val volume24hourto = formatBigDecimals(quote.volume24hourto ?: 0.0)
+        val open24hour = formatCurrency(quote.open24hour ?: 0.0)
+        val high24hour = formatCurrency(quote.high24hour ?: 0.0)
+        val low24hour = formatCurrency(quote.low24hour ?: 0.0)
         val changepct24hour = quote.changepct24hour?.toString() ?: EMPTY_STRING
         val changepcthour = quote.changepcthour?.toString() ?: EMPTY_STRING
-        val mktCap = quote.mktCap?.toString() ?: EMPTY_STRING
+        val mktCap = formatBigDecimals(quote.mktCap ?: 0.0)
         val imageUrl = BuildConfig.baseImageUrl + coin.coin?.imageUrl
 
         val coinEntity = Coin(
@@ -166,15 +166,28 @@ fun SearchCoinEntity.toCoin(): Coin = with(this) {
     )
 }
 
-private fun formatPrice(price: Double?): String {
-    val symbols = DecimalFormatSymbols(Locale.ENGLISH)
-    if (price != null) {
-        if (price < 1.0) {
-            return DecimalFormat("#.######", symbols).format(price)
+private fun formatCurrency(currency: Double): String {
+    return try {
+        when {
+            currency < 1.0 -> String.format("%.6f", currency)
+            currency == 1.0 -> String.format("%.1f", currency)
+            currency > 1.0 -> String.format("%.2f", currency)
+            else -> currency.toString()
         }
-        else if (price == 1.0) {
-            return DecimalFormat("#.0", symbols).format(price)
-        }
+    } catch (e: Exception) {
+        throw e
     }
-    return DecimalFormat("###.######", symbols).format(price)
+}
+
+private fun formatBigDecimals(value: Double): String {
+    return try {
+        when {
+            value >= 1000000000.0 -> String.format("%.2fB", value / 1000000000.0)
+            value >= 1000000.0 -> String.format("%.2fM", value / 1000000.0)
+            value >=1000.0 -> String.format("%.2fK", value / 1000.0)
+            else -> value.toString()
+        }
+    } catch (e: Exception) {
+        throw e
+    }
 }

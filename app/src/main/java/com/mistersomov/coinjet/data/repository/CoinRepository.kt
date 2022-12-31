@@ -23,6 +23,10 @@ class CoinRepository @Inject constructor(
         .onEach { coinList -> saveCoinListToCache(coinList) }
         .flowOn(defaultDispatcher)
 
+    fun getCoinById(coinId: String): Flow<Coin> = localDataSource.getCoinById(coinId)
+        .map { entity -> entity.toCoin() }
+        .flowOn(defaultDispatcher)
+
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun searchCoin(query: String): Flow<List<Coin>> {
         val formattedQuery = buildString {
@@ -40,9 +44,11 @@ class CoinRepository @Inject constructor(
             }
                 .flowOn(defaultDispatcher)
 
-            else -> merge(getSearchSpecificCoinList(formattedQuery), getSpecificCoinListFromCache(
-                formattedQuery
-            )).mapLatest {
+            else -> merge(
+                getSearchSpecificCoinList(formattedQuery), getSpecificCoinListFromCache(
+                    formattedQuery
+                )
+            ).mapLatest {
                 when {
                     it.isEmpty() -> emptyList()
                     else -> it.sortedByDescending { coin -> coin.price.toDouble() }

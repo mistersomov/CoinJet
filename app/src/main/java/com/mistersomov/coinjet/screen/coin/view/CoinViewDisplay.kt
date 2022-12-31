@@ -33,6 +33,7 @@ import com.mistersomov.coinjet.utils.asPercentage
 fun CoinViewDisplay(
     viewState: CoinViewState.Display,
     navController: NavController,
+    onCoinClicked: (String) -> Unit,
 ) {
     val coinList = viewState.coinList
     val listState = rememberLazyListState()
@@ -48,13 +49,14 @@ fun CoinViewDisplay(
                 content = {
                     CoinDetails(coin = coin)
                 }) {
+                onCoinClicked.invoke(coin.id)
             }
         }
     }
 }
 
 @Composable
-fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
+fun CoinDetails(coin: Coin) {
     val imageModel by remember { mutableStateOf(coin.imageUrl) }
     val name by remember { mutableStateOf(coin.name) }
     val fullName by remember { mutableStateOf(coin.fullName) }
@@ -62,7 +64,6 @@ fun CoinDetails(coin: Coin, isFavorite: Boolean = false) {
     AsyncImage(
         model = imageModel,
         modifier = Modifier
-            .padding(start = if (isFavorite) 10.dp else 0.dp)
             .size(32.dp)
             .clip(CircleShape),
         contentDescription = null,
