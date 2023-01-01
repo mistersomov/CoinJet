@@ -9,14 +9,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +33,7 @@ import com.mistersomov.coinjet.data.model.Coin
 import com.mistersomov.coinjet.core_ui.component.ListItem
 import com.mistersomov.coinjet.screen.coin.model.CoinViewState
 import com.mistersomov.coinjet.utils.asPercentage
+import kotlinx.coroutines.launch
 
 @Composable
 fun CoinViewDisplay(
@@ -35,21 +41,38 @@ fun CoinViewDisplay(
     navController: NavController,
     onCoinClicked: (String) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     val coinList = viewState.coinList
     val listState = rememberLazyListState()
+    val isFirstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxHeight(1f),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        userScrollEnabled = true,
-    ) {
-        items(items = coinList, key = { coin -> coin.id }) { coin ->
-            ListItem(modifier = Modifier.padding(horizontal = 6.dp),
-                content = {
-                    CoinDetails(coin = coin)
-                }) {
-                onCoinClicked.invoke(coin.id)
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
+        if (!isFirstItemVisible) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { scope.launch { listState.animateScrollToItem(0) } }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.round_arrow_up),
+                        contentDescription = "BackTo Top",
+                        tint = CoinJetTheme.colors.primary
+                    )
+                }
+            }
+        }
+        LazyColumn(
+            state = listState,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            items(items = coinList, key = { coin -> coin.id }) { coin ->
+                ListItem(modifier = Modifier.padding(horizontal = 6.dp),
+                    content = {
+                        CoinDetails(coin = coin)
+                    }) {
+                    onCoinClicked.invoke(coin.id)
+                }
             }
         }
     }

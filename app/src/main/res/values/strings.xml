@@ -1,7 +1,7 @@
 <resources>
-    <string name="crypto_search_placeholder" translatable="false">ETHEREUM, BITCOIN</string>
     <string name="crypto_favorites">Favorites</string>
     <string name="crypto_last_update">Updated: %s </string>
+    <string name="crypto_back_to_top">Back To Top</string>
 
     <!--Coin Details-->
     <string name="coin_details_high_day">High Day</string>
@@ -12,6 +12,7 @@
     <string name="coin_details_volume_to">24h Vol(%s)</string>
 
     <!--Search-->
+    <string name="crypto_search_placeholder" translatable="false">ETHEREUM, BITCOIN</string>
     <string name="crypto_search_headline_title">Cryptoassets</string>
     <string name="crypto_search_headline_title_recent_searches">Recent Searches</string>
     <string name="crypto_search_headline_title_first_search">Find something</string>
