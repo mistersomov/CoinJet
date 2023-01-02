@@ -1,6 +1,7 @@
 package com.mistersomov.coinjet.screen.coin.view
 
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -46,8 +47,8 @@ fun CoinViewDisplay(
     val listState = rememberLazyListState()
     val isFirstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
 
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
-        if (!isFirstItemVisible) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        AnimatedVisibility(visible = !isFirstItemVisible, ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -56,17 +57,18 @@ fun CoinViewDisplay(
                 IconButton(onClick = { scope.launch { listState.animateScrollToItem(0) } }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.round_arrow_up),
-                        contentDescription = "BackTo Top",
+                        contentDescription = null,
                         tint = CoinJetTheme.colors.primary
                     )
                 }
             }
         }
         LazyColumn(
+            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center,
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            items(items = coinList, key = { coin -> coin.id }) { coin ->
+            items(items = coinList, key = { coin -> coin.id }, contentType = { it::class.java }) { coin ->
                 ListItem(modifier = Modifier.padding(horizontal = 6.dp),
                     content = {
                         CoinDetails(coin = coin)

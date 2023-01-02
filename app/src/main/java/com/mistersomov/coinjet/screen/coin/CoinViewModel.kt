@@ -64,7 +64,7 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun fetchData() {
-        viewModelScope.launch(CoroutineName("fetchDataCoroutine")) {
+        viewModelScope.launch(Dispatchers.Default) {
             repository.latestCoinList.collect { coinList ->
                 if (coinList.isEmpty()) {
                     _coinViewState.value = CoinViewState.NoItems
