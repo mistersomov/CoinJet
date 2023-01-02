@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.data.model
+package com.mistersomov.coinjet.domain.model
 
 data class Coin(
     val id: String,

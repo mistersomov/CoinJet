@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
-import com.mistersomov.coinjet.data.model.Coin
+import com.mistersomov.coinjet.domain.model.Coin
 import kotlinx.coroutines.launch
 
 @Composable
