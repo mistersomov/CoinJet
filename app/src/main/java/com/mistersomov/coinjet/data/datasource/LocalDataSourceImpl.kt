@@ -16,18 +16,21 @@ class LocalDataSourceImpl @Inject constructor(
     private val searchCoinDao: SearchCoinDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LocalDataSource {
-    override suspend fun saveCoinListToCache(coinList: List<CoinEntity>) = withContext(ioDispatcher) {
-        coinDao.insertAll(coinList)
+    override suspend fun saveCoinListToCache(coinList: List<CoinEntity>) {
+        withContext(ioDispatcher) {
+            coinDao.insertAll(coinList)
+        }
     }
 
-    override fun getCoinListFromCache(): Flow<List<CoinEntity>> =
-        coinDao.getAll().flowOn(ioDispatcher)
+    override suspend fun getCoinListFromCache(): List<CoinEntity> {
+        return withContext(ioDispatcher) {
+            coinDao.getAll()
+        }
+    }
 
-    override fun getCoinById(coinId: String): Flow<CoinEntity> =
-        coinDao.getById(coinId).flowOn(ioDispatcher)
-
-    override fun getSpecificCoinList(query: String): Flow<List<CoinEntity>> =
-        coinDao.getAllByName(query).flowOn(ioDispatcher)
+    override fun getCoinById(coinId: String): Flow<CoinEntity> {
+        return coinDao.getById(coinId).flowOn(ioDispatcher)
+    }
 
     override suspend fun deleteCoinListFromCache() = withContext(ioDispatcher) {
         coinDao.deleteAll()
@@ -39,9 +42,6 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun getRecentSearchList(): Flow<List<SearchCoinEntity>> =
         searchCoinDao.getAll().flowOn(ioDispatcher)
-
-    override fun getRecentSearchSpecificCoinList(query: String): Flow<List<SearchCoinEntity>> =
-        searchCoinDao.getAllByName(query).flowOn(ioDispatcher)
 
     override suspend fun clearSearchList() = withContext(ioDispatcher) {
         searchCoinDao.deleteAll()

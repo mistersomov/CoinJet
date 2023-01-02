@@ -56,39 +56,15 @@ fun SearchViewRecent(
         Divider(
             modifier = Modifier.fillMaxWidth(), color = CoinJetTheme.colors.surfaceVariant
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 32.dp, top = 10.dp, bottom = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.crypto_search_category_fullname),
-                color = CoinJetTheme.colors.surfaceVariant,
-                style = CoinJetTheme.typography.labelSmall
-            )
-            Text(
-                text = stringResource(id = R.string.crypto_search_category_name),
-                color = CoinJetTheme.colors.surfaceVariant,
-                style = CoinJetTheme.typography.labelSmall
-            )
-            Text(
-                text = stringResource(id = R.string.crypto_search_category_price),
-                color = CoinJetTheme.colors.surfaceVariant,
-                style = CoinJetTheme.typography.labelSmall
-            )
-            Text(
-                text = stringResource(id = R.string.crypto_search_category_24h_changes),
-                color = CoinJetTheme.colors.surfaceVariant,
-                style = CoinJetTheme.typography.labelSmall
-            )
-        }
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            items(items = recentSearchList, key = { coin -> coin.id }) { item ->
+            items(
+                items = recentSearchList,
+                key = { coin -> coin.id },
+                contentType = { it::class.java }
+            ) { item ->
                 SearchCoinDetails(
                     coin = item,
                     onItemClicked = { onItemClicked.invoke(item) }

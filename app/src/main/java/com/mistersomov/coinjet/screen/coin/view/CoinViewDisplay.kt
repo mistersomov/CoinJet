@@ -26,6 +26,7 @@ import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.core_ui.component.ListItem
+import com.mistersomov.coinjet.data.formatCurrencyToDisplay
 import com.mistersomov.coinjet.screen.coin.model.CoinViewState
 import com.mistersomov.coinjet.utils.asPercentage
 
@@ -58,7 +59,7 @@ fun CoinViewDisplay(
 @Composable
 fun CoinDetails(coin: Coin) {
     val imageModel by remember { mutableStateOf(coin.imageUrl) }
-    val name by remember { mutableStateOf(coin.name) }
+    val name by remember { mutableStateOf(coin.symbol) }
     val fullName by remember { mutableStateOf(coin.fullName) }
 
     AsyncImage(
@@ -119,7 +120,7 @@ fun CoinDetails(coin: Coin) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = coin.price,
+                    text = coin.price.formatCurrencyToDisplay(),
                     color = animatePriceColor(price = coin.price.toDouble()),
                     style = CoinJetTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,

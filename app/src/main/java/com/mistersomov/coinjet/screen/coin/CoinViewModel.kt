@@ -1,8 +1,8 @@
 package com.mistersomov.coinjet.screen.coin
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mistersomov.coinjet.di.qualifier.DefaultDispatcher
 import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.domain.use_case.coin.*
 import com.mistersomov.coinjet.screen.coin.model.*
@@ -19,6 +19,7 @@ class CoinViewModel @Inject constructor(
     private val getRecentSearchListUseCase: GetRecentSearchListUseCase,
     private val getCoinListBySearchUseCase: GetCoinListBySearchUseCase,
     private val clearSearchListUseCase: ClearSearchListUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private var _coinViewState = MutableStateFlow<CoinViewState>(CoinViewState.Loading)
@@ -53,7 +54,7 @@ class CoinViewModel @Inject constructor(
         when (event) {
             is SearchEvent.Hide -> hideSearch()
             is SearchEvent.SearchClick -> showRecentSearch()
-            is SearchEvent.LaunchSearch -> performSearch(event.query)
+            is SearchEvent.LaunchSearch -> getCoinListBySearch(event.query)
             is SearchEvent.SaveCoin -> saveCoinToCache(event.coin)
             is SearchEvent.ClearCache -> deleteSearchList()
         }
@@ -86,9 +87,8 @@ class CoinViewModel @Inject constructor(
         viewModelScope.launch(detailsJob) {
             while (isActive) {
                 getCoinByIdUseCase(coinId).collect { coin ->
-                        _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
-                        Log.e("COIN", coin.toString())
-                    }
+                    _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
+                }
             }
         }
     }
@@ -109,24 +109,31 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    private fun performSearch(query: String) {
-        viewModelScope.launch(searchJob + Dispatchers.Default) {
+    @OptIn(FlowPreview::class)
+    private fun getCoinListBySearch(query: String) {
+        viewModelScope.launch(searchJob + defaultDispatcher) {
             if (query.isBlank()) {
                 showRecentSearch()
             } else {
-                getCoinListBySearchUseCase(query).collect { list ->
-                    _searchViewState.value = when {
-                        list.isEmpty() -> SearchViewState.NoItems
-                        else -> SearchViewState.Global(globalSearchList = list)
-                    }
-                    cancelSearchJob()
+                flow {
+                    emit(query)
+                    delay(DELAY_SEARCH)
                 }
+                    .debounce(DELAY_SEARCH)
+                    .collect {
+                        val searchList = getCoinListBySearchUseCase(it)
+
+                        _searchViewState.value = when {
+                            searchList.isEmpty() -> SearchViewState.NoItems
+                            else -> SearchViewState.Global(globalSearchList = searchList)
+                        }
+                    }
             }
         }
     }
 
     private fun saveCoinToCache(coin: Coin) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             saveCoinToCacheUseCase(coin)
             _searchViewState.value = SearchViewState.Hide
         }
@@ -136,5 +143,9 @@ class CoinViewModel @Inject constructor(
         viewModelScope.launch {
             clearSearchListUseCase()
         }
+    }
+
+    companion object {
+        private const val DELAY_SEARCH = 500L
     }
 }
