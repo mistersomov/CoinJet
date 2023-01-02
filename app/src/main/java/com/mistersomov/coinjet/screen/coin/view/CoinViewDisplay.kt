@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
-import com.mistersomov.coinjet.data.model.Coin
+import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.core_ui.component.ListItem
 import com.mistersomov.coinjet.screen.coin.model.CoinViewState
 import com.mistersomov.coinjet.utils.asPercentage

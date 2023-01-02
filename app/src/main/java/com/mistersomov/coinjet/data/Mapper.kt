@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.mistersomov.coinjet.BuildConfig
 import com.mistersomov.coinjet.data.database.entity.CoinEntity
 import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
-import com.mistersomov.coinjet.data.model.Coin
+import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.data.network.model.CoinListDto
 import com.mistersomov.coinjet.data.network.model.QuoteDto
 import com.mistersomov.coinjet.data.network.model.QuoteJsonContainerDto
@@ -182,9 +182,9 @@ private fun formatCurrency(currency: Double): String {
 private fun formatBigDecimals(value: Double): String {
     return try {
         when {
-            value >= 1000000000.0 -> String.format("%.2fB", value / 1000000000.0)
-            value >= 1000000.0 -> String.format("%.2fM", value / 1000000.0)
-            value >=1000.0 -> String.format("%.2fK", value / 1000.0)
+            value >= 1000000000.0 -> String.format("%.2fB", value / 1000000000)
+            value >= 1000000.0 -> String.format("%.2fM", value / 1000000)
+            value >=1000.0 -> String.format("%.2fK", value / 1000)
             else -> value.toString()
         }
     } catch (e: Exception) {

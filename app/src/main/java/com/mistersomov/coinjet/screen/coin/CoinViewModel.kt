@@ -3,8 +3,8 @@ package com.mistersomov.coinjet.screen.coin
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mistersomov.coinjet.data.model.Coin
-import com.mistersomov.coinjet.data.repository.CoinRepository
+import com.mistersomov.coinjet.domain.model.Coin
+import com.mistersomov.coinjet.domain.use_case.coin.*
 import com.mistersomov.coinjet.screen.coin.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -13,7 +13,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinViewModel @Inject constructor(
-    private val repository: CoinRepository,
+    private val fetchDataUseCase: FetchDataUseCase,
+    private val getCoinByIdUseCase: GetCoinByIdUseCase,
+    private val saveCoinToCacheUseCase: SaveCoinToCacheUseCase,
+    private val getRecentSearchListUseCase: GetRecentSearchListUseCase,
+    private val getCoinListBySearchUseCase: GetCoinListBySearchUseCase,
+    private val clearSearchListUseCase: ClearSearchListUseCase,
 ) : ViewModel() {
 
     private var _coinViewState = MutableStateFlow<CoinViewState>(CoinViewState.Loading)
@@ -64,12 +69,11 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun fetchData() {
-        viewModelScope.launch(CoroutineName("fetchDataCoroutine")) {
-            repository.latestCoinList.collect { coinList ->
-                if (coinList.isEmpty()) {
-                    _coinViewState.value = CoinViewState.NoItems
-                } else {
-                    _coinViewState.value = CoinViewState.Display(coinList = coinList)
+        viewModelScope.launch {
+            fetchDataUseCase().collect { coinList ->
+                when {
+                    coinList.isEmpty() -> _coinViewState.value = CoinViewState.NoItems
+                    else -> _coinViewState.value = CoinViewState.Display(coinList = coinList)
                 }
             }
         }
@@ -81,8 +85,7 @@ class CoinViewModel @Inject constructor(
         }
         viewModelScope.launch(detailsJob) {
             while (isActive) {
-                repository.getCoinById(coinId)
-                    .collect { coin ->
+                getCoinByIdUseCase(coinId).collect { coin ->
                         _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
                         Log.e("COIN", coin.toString())
                     }
@@ -96,7 +99,7 @@ class CoinViewModel @Inject constructor(
 
     private fun showRecentSearch() {
         viewModelScope.launch {
-            repository.getSearchList().collect { searchList ->
+            getRecentSearchListUseCase().collect { searchList ->
                 when {
                     searchList.isEmpty() -> _searchViewState.value = SearchViewState.FirstSearch
                     else -> _searchViewState.value =
@@ -110,27 +113,28 @@ class CoinViewModel @Inject constructor(
         viewModelScope.launch(searchJob + Dispatchers.Default) {
             if (query.isBlank()) {
                 showRecentSearch()
-            }
-            repository.searchCoin(query).collect { list ->
-                _searchViewState.value = when {
-                    list.isEmpty() -> SearchViewState.NoItems
-                    else -> SearchViewState.Global(globalSearchList = list)
+            } else {
+                getCoinListBySearchUseCase(query).collect { list ->
+                    _searchViewState.value = when {
+                        list.isEmpty() -> SearchViewState.NoItems
+                        else -> SearchViewState.Global(globalSearchList = list)
+                    }
+                    cancelSearchJob()
                 }
-                cancelSearchJob()
             }
         }
     }
 
     private fun saveCoinToCache(coin: Coin) {
-        viewModelScope.launch(CoroutineName("saveCoinToCache")) {
-            repository.saveSearchCoinToCache(coin)
+        viewModelScope.launch() {
+            saveCoinToCacheUseCase(coin)
             _searchViewState.value = SearchViewState.Hide
         }
     }
 
     private fun deleteSearchList() {
         viewModelScope.launch {
-            repository.clearSearchList()
+            clearSearchListUseCase()
         }
     }
 }
