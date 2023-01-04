@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
-import com.mistersomov.coinjet.screen.coin.view.PercentChanging
 
 @Composable
 fun SearchCoinDetails(
@@ -43,29 +42,11 @@ fun SearchCoinDetails(
             alignment = Alignment.Center,
             contentScale = ContentScale.Crop
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = coin?.fullName ?: "null",
-                color = CoinJetTheme.colors.onPrimary,
-                style = CoinJetTheme.typography.titleMedium,
-            )
-            Text(
-                text = coin?.name ?: "null",
-                color = CoinJetTheme.colors.onPrimary,
-                style = CoinJetTheme.typography.titleSmall,
-            )
-            Text(
-                text = coin?.price?.toString() ?: "null",
-                color = CoinJetTheme.colors.onPrimary,
-                style = CoinJetTheme.typography.titleMedium,
-            )
-            PercentChanging(percent = coin?.changepct24hour?.toDouble() ?: 0.0)
-        }
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = (coin?.fullName + "(#${coin?.symbol})"),
+            color = CoinJetTheme.colors.onPrimary,
+            style = CoinJetTheme.typography.titleMedium,
+        )
     }
 }

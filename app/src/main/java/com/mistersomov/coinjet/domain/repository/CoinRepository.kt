@@ -8,7 +8,9 @@ interface CoinRepository {
 
     fun getCoinById(coinId: String): Flow<Coin>
 
-    fun getCoinListBySearch(query: String): Flow<List<Coin>>
+    suspend fun getCoinListByName(name: String): List<Coin>
+
+    suspend fun getCoinListBySymbol(symbol: String): List<Coin>
 
     suspend fun saveSearchCoinToCache(coin: Coin)
 

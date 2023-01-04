@@ -1,15 +1,13 @@
 package com.mistersomov.coinjet.core_ui.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +38,6 @@ import kotlinx.coroutines.launch
 fun Search(
     modifier: Modifier = Modifier,
     placeholderText: String?,
-    resultContent: @Composable () -> Unit,
     onFocusChanged: () -> Unit,
     onValueChanged: (String) -> Unit,
     onCancelClicked: () -> Unit,
@@ -93,7 +90,7 @@ fun Search(
                     )
                 },
                 trailingIcon = {
-                    if (isExpanded.value) {
+                    AnimatedVisibility(visible = isExpanded.value) {
                         Icon(
                             modifier = Modifier.clickable(interactionSource = remember {
                                 MutableInteractionSource()
@@ -131,7 +128,7 @@ fun Search(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
-            if (isExpanded.value) {
+            AnimatedVisibility(visible = isExpanded.value) {
                 Text(
                     modifier = Modifier
                         .padding(start = 12.dp)
@@ -152,9 +149,6 @@ fun Search(
                 )
             }
         }
-        if (isExpanded.value) {
-            resultContent.invoke()
-        }
     }
 }
 
@@ -164,11 +158,10 @@ fun PreviewSearch() {
     MainTheme() {
         Search(
             placeholderText = "ETHEREUM, BTC",
-            resultContent = { },
             onFocusChanged = {},
             onValueChanged = {},
             onCancelClicked = {},
-            onRemoveQuery = {  }
+            onRemoveQuery = { }
         )
     }
 }
