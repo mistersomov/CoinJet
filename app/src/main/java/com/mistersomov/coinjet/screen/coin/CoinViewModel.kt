@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinViewModel @Inject constructor(
     private val fetchDataUseCase: FetchDataUseCase,
-    private val getCoinByIdUseCase: GetCoinByIdUseCase,
+    private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
     private val saveCoinToCacheUseCase: SaveCoinToCacheUseCase,
     private val getRecentSearchListUseCase: GetRecentSearchListUseCase,
     private val getCoinListBySearchUseCase: GetCoinListBySearchUseCase,
@@ -37,7 +37,7 @@ class CoinViewModel @Inject constructor(
             if (field.isCancelled) field = Job()
             return field
         }
-    private var detailsJob = Job()
+    private var simpleDetailsJob = Job()
         get() {
             if (field.isCancelled) field = Job()
             return field
@@ -46,27 +46,23 @@ class CoinViewModel @Inject constructor(
     fun obtainEvent(event: CoinEvent) {
         when (event) {
             is CoinEvent.FetchData -> fetchData()
-            is CoinEvent.CoinClick -> performCoinClick(event.coinId)
+            is CoinEvent.Click -> performCoinClick(event.symbol)
         }
     }
 
     fun obtainSearchEvent(event: SearchEvent) {
         when (event) {
             is SearchEvent.Hide -> hideSearch()
-            is SearchEvent.SearchClick -> showRecentSearch()
+            is SearchEvent.Click -> showRecentSearch()
             is SearchEvent.LaunchSearch -> getCoinListBySearch(event.query)
-            is SearchEvent.SaveCoin -> saveCoinToCache(event.coin)
+            is SearchEvent.Save -> saveCoinToCache(event.coin)
             is SearchEvent.ClearCache -> deleteSearchList()
         }
     }
 
-    fun cancelSearchJob() {
-        searchJob.cancel()
-    }
-
-    fun cancelDetailsJob() {
-        detailsJob.cancel()
-        _coinDetailsViewState.value = CoinDetailsViewState.Hide
+    fun cancelSimpleDetailsJob() {
+        hideSimpleDetails()
+        simpleDetailsJob.cancel()
     }
 
     private fun fetchData() {
@@ -80,21 +76,28 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    private fun performCoinClick(coinId: String) {
-        if (_coinDetailsViewState.value is CoinDetailsViewState.SimpleDetails) {
-            detailsJob.cancel()
+    private fun performCoinClick(symbol: String) {
+        if (_searchViewState.value !is SearchViewState.Hide) {
+            hideSearch()
         }
-        viewModelScope.launch(detailsJob) {
+        if (_coinDetailsViewState.value is CoinDetailsViewState.SimpleDetails) {
+            simpleDetailsJob.cancel()
+        }
+        viewModelScope.launch(simpleDetailsJob) {
             while (isActive) {
-                getCoinByIdUseCase(coinId).collect { coin ->
+                getCoinBySymbolUseCase(symbol).collect { coin ->
                     _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
                 }
             }
         }
     }
 
-    private fun hideSearch() {
+    fun hideSearch() {
         _searchViewState.value = SearchViewState.Hide
+    }
+
+    private fun hideSimpleDetails() {
+        _coinDetailsViewState.value = CoinDetailsViewState.Hide
     }
 
     private fun showRecentSearch() {

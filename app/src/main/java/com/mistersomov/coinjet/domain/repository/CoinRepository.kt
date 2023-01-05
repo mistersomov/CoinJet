@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface CoinRepository {
     fun getLatestCoinList(): Flow<List<Coin>>
 
-    fun getCoinById(coinId: String): Flow<Coin>
+    fun getCoinBySymbol(symbol: String): Flow<Coin>
 
     suspend fun getCoinListByName(name: String): List<Coin>
 

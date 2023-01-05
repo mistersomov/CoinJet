@@ -28,8 +28,8 @@ class CoinRepositoryImpl @Inject constructor(
             .flowOn(defaultDispatcher)
     }
 
-    override fun getCoinById(coinId: String): Flow<Coin> {
-        return localDataSource.getCoinById(coinId)
+    override fun getCoinBySymbol(symbol: String): Flow<Coin> {
+        return localDataSource.getCoinBySymbol(symbol)
             .map { entity -> entity.toCoin() }
             .flowOn(defaultDispatcher)
     }
@@ -40,6 +40,7 @@ class CoinRepositoryImpl @Inject constructor(
                 when {
                     entityList.isEmpty() -> emptyList()
                     else -> entityList
+                        .distinctBy { it.symbol }
                         .map { entity -> entity.toCoin() }
                         .sortedByDescending { coin -> coin.mktCap }
                 }

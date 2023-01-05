@@ -6,11 +6,11 @@ sealed class SearchEvent {
 
     object Hide : SearchEvent()
 
-    object SearchClick : SearchEvent()
+    object Click : SearchEvent()
 
     data class LaunchSearch(val query: String) : SearchEvent()
 
-    data class SaveCoin(val coin: Coin) : SearchEvent()
+    data class Save(val coin: Coin) : SearchEvent()
 
     object ClearCache : SearchEvent()
 }

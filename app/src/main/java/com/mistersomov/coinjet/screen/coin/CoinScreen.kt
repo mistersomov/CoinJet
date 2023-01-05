@@ -52,47 +52,44 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                 placeholderText = stringResource(id = R.string.crypto_search_placeholder),
                 onFocusChanged = {
                     with(viewModel) {
-                        cancelDetailsJob()
-                        obtainSearchEvent(SearchEvent.SearchClick)
+                        cancelSimpleDetailsJob()
+                        obtainSearchEvent(SearchEvent.Click)
                     }
                     scope.launch { scaffoldState.reveal() }
                 },
                 onValueChanged = { viewModel.obtainSearchEvent(SearchEvent.LaunchSearch(it)) },
-                onCancelClicked = { viewModel.cancelSearchJob() },
-                onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.SearchClick) },
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                onCancelClicked = { viewModel.hideSearch() },
+                onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.Click) },
             ) {
-                when (val currentSearchState = searchViewState.value) {
-                    is SearchViewState.Hide -> {  }
-                    is SearchViewState.NoItems -> SearchViewNoItems()
-                    is SearchViewState.FirstSearch -> SearchViewFirst()
-                    is SearchViewState.Recent -> SearchViewRecent(
-                        viewState = currentSearchState,
-                        onItemClicked = {
-                            scope.launch { scaffoldState.reveal() }
-                            with(viewModel) {
-                                obtainEvent(CoinEvent.CoinClick(it.id))
-                                obtainSearchEvent(SearchEvent.Hide)
-                            }
-                        },
-                        onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
-                    )
-                    is SearchViewState.Global -> SearchViewGlobal(
-                        viewState = currentSearchState,
-                        onItemClicked = {
-                            scope.launch { scaffoldState.reveal() }
-                            with(viewModel) {
-                                obtainSearchEvent(SearchEvent.Hide)
-                                obtainSearchEvent(SearchEvent.SaveCoin(it))
-                                obtainEvent(CoinEvent.CoinClick(it.id))
-                            }
-                        })
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    when (val currentSearchState = searchViewState.value) {
+                        is SearchViewState.Hide -> Unit
+                        is SearchViewState.NoItems -> SearchViewNoItems()
+                        is SearchViewState.FirstSearch -> SearchViewFirst()
+                        is SearchViewState.Recent -> SearchViewRecent(
+                            viewState = currentSearchState,
+                            onItemClicked = {
+                                scope.launch { scaffoldState.reveal() }
+                                viewModel.obtainEvent(CoinEvent.Click(it.symbol))
+                            },
+                            onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
+                        )
+                        is SearchViewState.Global -> SearchViewGlobal(
+                            viewState = currentSearchState,
+                            onItemClicked = {
+                                with(viewModel) {
+                                    obtainEvent(CoinEvent.Click(it.symbol))
+                                    obtainSearchEvent(SearchEvent.Save(it))
+                                }
+                                scope.launch { scaffoldState.reveal() }
+                            })
+                    }
                 }
             }
             when (val current = detailsViewState.value) {
@@ -101,7 +98,12 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                         horizontal = 8.dp
                     ),
                     coin = current.coin,
-                    onCancelClicked = { viewModel.cancelDetailsJob() }
+                    onCancelClicked = {
+                        with(viewModel) {
+                            hideSearch()
+                            cancelSimpleDetailsJob()
+                        }
+                    }
                 )
                 else -> Unit
             }
@@ -119,9 +121,8 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                             onCoinClicked = {
                                 scope.launch { scaffoldState.reveal() }
                                 with(viewModel) {
-                                    obtainSearchEvent(SearchEvent.Hide)
-                                    obtainEvent(CoinEvent.CoinClick(it))
-                                    cancelSearchJob()
+                                    obtainEvent(CoinEvent.Click(it))
+                                    hideSearch()
                                 }
                             }
                         )

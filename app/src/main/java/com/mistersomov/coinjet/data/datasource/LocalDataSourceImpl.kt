@@ -28,8 +28,8 @@ class LocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getCoinById(coinId: String): Flow<CoinEntity> {
-        return coinDao.getById(coinId).flowOn(ioDispatcher)
+    override fun getCoinBySymbol(symbol: String): Flow<CoinEntity> {
+        return coinDao.getBySymbol(symbol).flowOn(ioDispatcher)
     }
 
     override suspend fun deleteCoinListFromCache() = withContext(ioDispatcher) {

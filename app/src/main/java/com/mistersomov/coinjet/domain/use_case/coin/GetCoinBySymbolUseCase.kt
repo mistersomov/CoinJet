@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class GetCoinByIdUseCase @Inject constructor(
+class GetCoinBySymbolUseCase @Inject constructor(
     private val repository: CoinRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    operator fun invoke(coinId: String): Flow<Coin> {
-        return repository.getCoinById(coinId).flowOn(defaultDispatcher)
+    operator fun invoke(symbol: String): Flow<Coin> {
+        return repository.getCoinBySymbol(symbol).flowOn(defaultDispatcher)
     }
 }

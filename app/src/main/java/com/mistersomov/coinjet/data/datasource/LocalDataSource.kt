@@ -8,7 +8,7 @@ interface LocalDataSource {
 
     suspend fun getCoinListFromCache(): List<CoinEntity>
 
-    fun getCoinById(coinId: String): Flow<CoinEntity>
+    fun getCoinBySymbol(symbol: String): Flow<CoinEntity>
 
     suspend fun saveCoinListToCache(coinList: List<CoinEntity>)
 
