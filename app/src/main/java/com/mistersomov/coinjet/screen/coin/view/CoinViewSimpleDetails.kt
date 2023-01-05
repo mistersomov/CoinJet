@@ -23,9 +23,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
-import com.mistersomov.coinjet.data.formatBigDecimalsToDisplay
-import com.mistersomov.coinjet.data.formatCurrencyToDisplay
+import com.mistersomov.coinjet.core_ui.effect.animateDigitColor
 import com.mistersomov.coinjet.domain.model.Coin
+import com.mistersomov.coinjet.utils.formatBigDecimalsToDisplay
+import com.mistersomov.coinjet.utils.formatCurrencyToDisplay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,6 +61,11 @@ fun CoinViewSimpleDetails(
                 )
 
             }
+            Text(
+                text = coin.fullName,
+                style = CoinJetTheme.typography.titleLarge,
+                color = CoinJetTheme.colors.onPrimary
+            )
             IconButton(onClick = {
                 scope.launch {
                     favoriteIconId.value = when (favoriteIconId.value) {
@@ -104,7 +110,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.high24hour.formatCurrencyToDisplay(),
+                    text = coin.high24Hour.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -117,7 +123,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.low24hour.formatCurrencyToDisplay(),
+                    text = coin.low24Hour.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -138,7 +144,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.open24hour.formatCurrencyToDisplay(),
+                    text = coin.open24Hour.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -167,12 +173,15 @@ fun CoinViewSimpleDetails(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.coin_details_high_day),
+                    text = String.format(
+                        stringResource(id = R.string.coin_details_volume),
+                        coin.symbol
+                    ),
                     style = CoinJetTheme.typography.labelSmall,
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.volume24hour.formatBigDecimalsToDisplay(),
+                    text = coin.volume24Hour.formatBigDecimalsToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -180,12 +189,15 @@ fun CoinViewSimpleDetails(
                     modifier = Modifier.height(12.dp)
                 )
                 Text(
-                    text = stringResource(id = R.string.coin_details_low_day),
+                    text = String.format(
+                        stringResource(id = R.string.coin_details_volume),
+                        coin.toSymbol
+                    ),
                     style = CoinJetTheme.typography.labelSmall,
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.volume24hourto.formatBigDecimalsToDisplay(),
+                    text = coin.volume24hourTo.formatBigDecimalsToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -204,14 +216,17 @@ fun CoinViewSimpleDetails(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = coin.symbol + "/" + coin.toSymbol,
+                    text = '#' + coin.symbol + " / " + coin.toSymbol,
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
                     text = coin.price.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.headlineMedium,
-                    color = CoinJetTheme.colors.onPrimary
+                    color = animateDigitColor(
+                        digit = coin.price,
+                        initialColor = CoinJetTheme.colors.onPrimary
+                    )
                 )
             }
             IconButton(onClick = { }) {
