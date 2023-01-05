@@ -4,19 +4,18 @@ import com.google.gson.Gson
 import com.mistersomov.coinjet.BuildConfig
 import com.mistersomov.coinjet.data.database.entity.CoinEntity
 import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
-import com.mistersomov.coinjet.data.model.Coin
+import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.data.network.model.CoinListDto
 import com.mistersomov.coinjet.data.network.model.QuoteDto
 import com.mistersomov.coinjet.data.network.model.QuoteJsonContainerDto
 import com.mistersomov.coinjet.utils.convertTime
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.util.*
 
 const val EMPTY_STRING = ""
 
 fun CoinListDto.toSimpleCoinString() =
-    this.coins?.map { it.coin?.name }?.joinToString(",") ?: EMPTY_STRING
+    this.coins?.map { it.coin?.symbol }?.joinToString(",") ?: EMPTY_STRING
 
 fun QuoteJsonContainerDto.toQuoteList(): List<QuoteDto> {
     val result = mutableListOf<QuoteDto>()
@@ -41,26 +40,26 @@ fun mapResponseToCoinList(quoteList: List<QuoteDto>, coinListDto: CoinListDto): 
     val result = mutableListOf<Coin>()
 
     quoteList.zip(coinListDto.coins) { quote, coin ->
-        val id = coin.coin?.id ?: EMPTY_STRING
-        val name = coin.coin?.name ?: EMPTY_STRING
+        val id = coinListDto.coins.indexOf(coin).toString()
+        val symbol = coin.coin?.symbol ?: EMPTY_STRING
         val fullName = coin.coin?.fullName ?: EMPTY_STRING
         val fromSymbol = quote.fromSymbol ?: EMPTY_STRING
         val toSymbol = quote.toSymbol ?: EMPTY_STRING
-        val price = formatCurrency(quote.price ?: 0.0)
+        val price = quote.price ?: 0.0
         val lastUpdate = quote.lastUpdate.convertTime()
-        val volume24hour = formatBigDecimals(quote.volume24hour ?: 0.0)
-        val volume24hourto = formatBigDecimals(quote.volume24hourto ?: 0.0)
-        val open24hour = formatCurrency(quote.open24hour ?: 0.0)
-        val high24hour = formatCurrency(quote.high24hour ?: 0.0)
-        val low24hour = formatCurrency(quote.low24hour ?: 0.0)
-        val changepct24hour = quote.changepct24hour?.toString() ?: EMPTY_STRING
-        val changepcthour = quote.changepcthour?.toString() ?: EMPTY_STRING
-        val mktCap = formatBigDecimals(quote.mktCap ?: 0.0)
+        val volume24hour = quote.volume24hour ?: 0.0
+        val volume24hourto = quote.volume24hourto ?: 0.0
+        val open24hour = quote.open24hour ?: 0.0
+        val high24hour = quote.high24hour ?: 0.0
+        val low24hour = quote.low24hour ?: 0.0
+        val changepct24hour = quote.changepct24hour ?: 0.0
+        val changepcthour = quote.changepcthour ?: 0.0
+        val mktCap = quote.mktCap ?: 0.0
         val imageUrl = BuildConfig.baseImageUrl + coin.coin?.imageUrl
 
         val coinEntity = Coin(
             id = id,
-            name = name,
+            symbol = symbol,
             fullName = fullName,
             fromSymbol = fromSymbol,
             toSymbol = toSymbol,
@@ -85,7 +84,7 @@ fun mapResponseToCoinList(quoteList: List<QuoteDto>, coinListDto: CoinListDto): 
 fun Coin.toCoinEntity(): CoinEntity = with(this) {
     CoinEntity(
         id = id,
-        name = name,
+        symbol = symbol,
         fullName = fullName,
         fromSymbol = fromSymbol,
         toSymbol = toSymbol,
@@ -106,7 +105,7 @@ fun Coin.toCoinEntity(): CoinEntity = with(this) {
 fun CoinEntity.toCoin(): Coin = with(this) {
     Coin(
         id = id,
-        name = name,
+        symbol = symbol,
         fullName = fullName,
         fromSymbol = fromSymbol,
         toSymbol = toSymbol,
@@ -127,7 +126,7 @@ fun CoinEntity.toCoin(): Coin = with(this) {
 fun Coin.toSearchCoinEntity(): SearchCoinEntity = with(this) {
     SearchCoinEntity(
         id = id,
-        name = name,
+        symbol = symbol,
         fullName = fullName,
         fromSymbol = fromSymbol,
         toSymbol = toSymbol,
@@ -148,7 +147,7 @@ fun Coin.toSearchCoinEntity(): SearchCoinEntity = with(this) {
 fun SearchCoinEntity.toCoin(): Coin = with(this) {
     Coin(
         id = id,
-        name = name,
+        symbol = symbol,
         fullName = fullName,
         fromSymbol = fromSymbol,
         toSymbol = toSymbol,
@@ -166,26 +165,25 @@ fun SearchCoinEntity.toCoin(): Coin = with(this) {
     )
 }
 
-private fun formatCurrency(currency: Double): String {
+fun Double.formatCurrencyToDisplay(): String {
+    val decimalFormat = NumberFormat.getInstance(Locale.US).also { it.maximumFractionDigits = 6 }
     return try {
         when {
-            currency < 1.0 -> String.format("%.6f", currency)
-            currency == 1.0 -> String.format("%.1f", currency)
-            currency > 1.0 -> String.format("%.2f", currency)
-            else -> currency.toString()
+            this == 1.0 -> String.format("%.1f", this)
+            else -> decimalFormat.format(this)
         }
     } catch (e: Exception) {
         throw e
     }
 }
 
-private fun formatBigDecimals(value: Double): String {
+fun Double.formatBigDecimalsToDisplay(): String {
     return try {
         when {
-            value >= 1000000000.0 -> String.format("%.2fB", value / 1000000000.0)
-            value >= 1000000.0 -> String.format("%.2fM", value / 1000000.0)
-            value >=1000.0 -> String.format("%.2fK", value / 1000.0)
-            else -> value.toString()
+            this >= 1000000000.0 -> String.format("%.2fB", this / 1000000000)
+            this >= 1000000.0 -> String.format("%.2fM", this / 1000000)
+            this >=1000.0 -> String.format("%.2fK", this / 1000)
+            else -> this.toString()
         }
     } catch (e: Exception) {
         throw e
