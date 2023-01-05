@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 /**
  * Search widget to embed in a searchable screen
  * @param placeholderText text for the placeholder
- * @param resultContent content resulting from a search query
  * @param onFocusChanged action that takes place when the search field focus is received
  * @param onValueChanged action that occurs when a search query changes
  */
@@ -42,6 +41,7 @@ fun Search(
     onValueChanged: (String) -> Unit,
     onCancelClicked: () -> Unit,
     onRemoveQuery: () -> Unit,
+    resultContent: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val text = rememberSaveable { mutableStateOf("") }
@@ -140,6 +140,7 @@ fun Search(
                                     text.value = ""
                                     focusManager.clearFocus(force = true)
                                     onCancelClicked.invoke()
+                                    isExpanded.value = false
                                 }
                             }
                         ),
@@ -148,6 +149,9 @@ fun Search(
                     color = CoinJetTheme.colors.onPrimary
                 )
             }
+        }
+        AnimatedVisibility(visible = isExpanded.value) {
+            resultContent.invoke()
         }
     }
 }
@@ -162,6 +166,6 @@ fun PreviewSearch() {
             onValueChanged = {},
             onCancelClicked = {},
             onRemoveQuery = { }
-        )
+        ) {  }
     }
 }

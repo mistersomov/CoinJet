@@ -45,12 +45,12 @@ fun CoinViewDisplay(
         horizontalAlignment = Alignment.CenterHorizontally,
         userScrollEnabled = true,
     ) {
-        items(items = coinList, key = { coin -> coin.id }) { coin ->
+        items(items = coinList, key = { coin -> coin.symbol }) { coin ->
             ListItem(modifier = Modifier.padding(horizontal = 6.dp),
                 content = {
                     CoinDetails(coin = coin)
                 }) {
-                onCoinClicked.invoke(coin.id)
+                onCoinClicked.invoke(coin.symbol)
             }
         }
     }

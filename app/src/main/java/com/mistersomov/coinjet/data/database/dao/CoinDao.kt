@@ -16,8 +16,8 @@ interface CoinDao {
     @Query("SELECT * from ${CoinEntity.TABLE_COIN_NAME} ORDER BY mktCap DESC")
     suspend fun getAll(): List<CoinEntity>
 
-    @Query("SELECT * from ${CoinEntity.TABLE_COIN_NAME} WHERE id == :id LIMIT 1")
-    fun getById(id: String): Flow<CoinEntity>
+    @Query("SELECT * from ${CoinEntity.TABLE_COIN_NAME} WHERE symbol == :symbol LIMIT 1")
+    fun getBySymbol(symbol: String): Flow<CoinEntity>
 
     @Query("DELETE from ${CoinEntity.TABLE_COIN_NAME}")
     suspend fun deleteAll()
