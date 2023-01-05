@@ -22,6 +22,12 @@ android {
         versionCode = Config.versionCode
         versionName = Config.versionName
 
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         resValue("string", "app_name", "CoinJet (debug)")
@@ -38,7 +44,6 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
 
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             resValue("string", "app_name", "CoinJet (debug)")
         }
         release {
