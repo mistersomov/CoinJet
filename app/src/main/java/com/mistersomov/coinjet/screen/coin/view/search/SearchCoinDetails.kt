@@ -44,7 +44,7 @@ fun SearchCoinDetails(
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
-            text = (coin?.fullName + "(#${coin?.symbol})"),
+            text = coin?.fullName ?: "",
             color = CoinJetTheme.colors.onPrimary,
             style = CoinJetTheme.typography.titleMedium,
         )

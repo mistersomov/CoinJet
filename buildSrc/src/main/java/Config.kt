@@ -2,8 +2,8 @@ object Config {
     const val compileSdk = 33
     const val minSDK = 26
     const val targetSDK = 33
-    const val versionCode = 1
-    const val versionName = "1.0"
+    const val versionCode = 3
+    const val versionName = "0.1.2"
     const val packageName = "com.mistersomov.coinjet"
 
     const val cryptoBaseUrl = "https://min-api.cryptocompare.com"

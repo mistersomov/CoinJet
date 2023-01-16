@@ -32,6 +32,11 @@ class CoinViewModel @Inject constructor(
         MutableStateFlow<CoinDetailsViewState>(CoinDetailsViewState.Hide)
     val coinDetailsViewState: StateFlow<CoinDetailsViewState> = _coinDetailsViewState
 
+    private var recentSearchJob = Job()
+        get() {
+            if (field.isCancelled) field = Job()
+            return field
+        }
     private var searchJob = Job()
         get() {
             if (field.isCancelled) field = Job()
@@ -53,7 +58,7 @@ class CoinViewModel @Inject constructor(
     fun obtainSearchEvent(event: SearchEvent) {
         when (event) {
             is SearchEvent.Hide -> hideSearch()
-            is SearchEvent.Click -> showRecentSearch()
+            is SearchEvent.RequestFocus -> showRecentSearch()
             is SearchEvent.LaunchSearch -> getCoinListBySearch(event.query)
             is SearchEvent.Save -> saveCoinToCache(event.coin)
             is SearchEvent.ClearCache -> deleteSearchList()
@@ -63,6 +68,20 @@ class CoinViewModel @Inject constructor(
     fun cancelSimpleDetailsJob() {
         hideSimpleDetails()
         simpleDetailsJob.cancel()
+    }
+
+    private fun cancelRecentSearchJob() {
+        hideSearch()
+        recentSearchJob.cancel()
+    }
+
+    private fun cancelSearchJob() {
+        hideSearch()
+        searchJob.cancel()
+    }
+
+    private fun hideSearch() {
+        _searchViewState.value = SearchViewState.Hide
     }
 
     private fun fetchData() {
@@ -77,9 +96,7 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun performCoinClick(symbol: String) {
-        if (_searchViewState.value !is SearchViewState.Hide) {
-            hideSearch()
-        }
+        cancelSearchJob()
         if (_coinDetailsViewState.value is CoinDetailsViewState.SimpleDetails) {
             simpleDetailsJob.cancel()
         }
@@ -92,21 +109,18 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    fun hideSearch() {
-        _searchViewState.value = SearchViewState.Hide
-    }
-
     private fun hideSimpleDetails() {
         _coinDetailsViewState.value = CoinDetailsViewState.Hide
     }
 
     private fun showRecentSearch() {
-        viewModelScope.launch {
+        viewModelScope.launch(recentSearchJob) {
             getRecentSearchListUseCase().collect { searchList ->
                 when {
-                    searchList.isEmpty() -> _searchViewState.value = SearchViewState.FirstSearch
-                    else -> _searchViewState.value =
+                    searchList.isNotEmpty() -> _searchViewState.value =
                         SearchViewState.Recent(recentSearchList = searchList)
+                    else -> _searchViewState.value = SearchViewState.NoItems
+
                 }
             }
         }
@@ -117,6 +131,7 @@ class CoinViewModel @Inject constructor(
         viewModelScope.launch(searchJob + defaultDispatcher) {
             if (query.isBlank()) {
                 showRecentSearch()
+                cancelSearchJob()
             } else {
                 flow {
                     emit(query)
@@ -137,8 +152,8 @@ class CoinViewModel @Inject constructor(
 
     private fun saveCoinToCache(coin: Coin) {
         viewModelScope.launch {
+            cancelRecentSearchJob()
             saveCoinToCacheUseCase(coin)
-            _searchViewState.value = SearchViewState.Hide
         }
     }
 

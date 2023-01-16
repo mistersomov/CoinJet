@@ -1,7 +1,5 @@
 package com.mistersomov.coinjet.screen.coin.view
 
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,11 +8,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +24,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
-import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.core_ui.component.ListItem
-import com.mistersomov.coinjet.data.formatCurrencyToDisplay
+import com.mistersomov.coinjet.core_ui.effect.animateDigitColor
+import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.screen.coin.model.CoinViewState
 import com.mistersomov.coinjet.utils.asPercentage
+import com.mistersomov.coinjet.utils.formatCurrencyToDisplay
 
 @Composable
 fun CoinViewDisplay(
@@ -121,7 +122,10 @@ fun CoinDetails(coin: Coin) {
             ) {
                 Text(
                     text = coin.price.formatCurrencyToDisplay(),
-                    color = animatePriceColor(price = coin.price.toDouble()),
+                    color = animateDigitColor(
+                        digit = coin.price,
+                        initialColor = CoinJetTheme.colors.onSurface
+                    ),
                     style = CoinJetTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Start,
@@ -129,7 +133,7 @@ fun CoinDetails(coin: Coin) {
                 )
                 PercentChanging(
                     modifier = Modifier.padding(start = 6.dp),
-                    percent = coin.changepct24hour.toDouble(),
+                    percent = coin.changePct24Hour.toDouble(),
                 )
             }
             Text(
@@ -182,26 +186,4 @@ fun PercentChanging(
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Composable
-fun animatePriceColor(price: Double): Color {
-    val previousPrice by remember { mutableStateOf(price) }
-    val initialColor = CoinJetTheme.colors.onSurface
-    val targetColor = if (price == previousPrice) {
-        initialColor
-    } else if (price > previousPrice) {
-        CoinJetTheme.colors.onGreen
-    } else {
-        CoinJetTheme.colors.error
-    }
-    val priceColor = remember { Animatable(initialColor) }
-    val duration = 2000
-
-    LaunchedEffect(key1 = price, block = {
-        priceColor.animateTo(targetColor, tween(durationMillis = duration))
-        priceColor.animateTo(initialColor, tween(durationMillis = duration))
-    })
-
-    return priceColor.value
 }

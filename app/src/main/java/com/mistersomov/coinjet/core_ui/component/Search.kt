@@ -11,8 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -41,13 +39,13 @@ fun Search(
     onValueChanged: (String) -> Unit,
     onCancelClicked: () -> Unit,
     onRemoveQuery: () -> Unit,
-    resultContent: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val text = rememberSaveable { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val isExpanded = remember { mutableStateOf(false) }
+
+    val pattern = remember { Regex("[a-zA-z#\\s]*") }
     val maxChar = 12
 
     Column(
@@ -63,10 +61,9 @@ fun Search(
             TextField(
                 modifier = Modifier
                     .weight(weight = if (!isExpanded.value) 0.5f else 1f)
-                    .focusRequester(focusRequester)
                     .onFocusChanged {
-                        scope.launch {
-                            isExpanded.value = it.isFocused
+                        if (it.isFocused) {
+                            isExpanded.value = true
                             onFocusChanged.invoke()
                         }
                     },
@@ -74,7 +71,9 @@ fun Search(
                 onValueChange = {
                     scope.launch {
                         isExpanded.value = true
-                        text.value = it.take(maxChar)
+                        if (it.matches(pattern)) {
+                            text.value = it.take(maxChar)
+                        }
                         onValueChanged.invoke(it)
                     }
                 },
@@ -126,7 +125,7 @@ fun Search(
                     )
                 },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
             )
             AnimatedVisibility(visible = isExpanded.value) {
                 Text(
@@ -150,9 +149,6 @@ fun Search(
                 )
             }
         }
-        AnimatedVisibility(visible = isExpanded.value) {
-            resultContent.invoke()
-        }
     }
 }
 
@@ -166,6 +162,6 @@ fun PreviewSearch() {
             onValueChanged = {},
             onCancelClicked = {},
             onRemoveQuery = { }
-        ) {  }
+        )
     }
 }
