@@ -47,13 +47,13 @@ fun mapResponseToCoinList(quoteList: List<QuoteDto>, coinListDto: CoinListDto): 
         val toSymbol = quote.toSymbol ?: EMPTY_STRING
         val price = quote.price ?: 0.0
         val lastUpdate = quote.lastUpdate.convertTime()
-        val volume24hour = quote.volume24hour ?: 0.0
-        val volume24hourto = quote.volume24hourto ?: 0.0
-        val open24hour = quote.open24hour ?: 0.0
-        val high24hour = quote.high24hour ?: 0.0
-        val low24hour = quote.low24hour ?: 0.0
-        val changepct24hour = quote.changepct24hour ?: 0.0
-        val changepcthour = quote.changepcthour ?: 0.0
+        val volume24Hour = quote.volume24hour ?: 0.0
+        val volume24HourTo = quote.volume24hourto ?: 0.0
+        val open24Hour = quote.open24hour ?: 0.0
+        val high24Hour = quote.high24hour ?: 0.0
+        val low24Hour = quote.low24hour ?: 0.0
+        val changePct24Hour = quote.changepct24hour ?: 0.0
+        val changePctHour = quote.changepcthour ?: 0.0
         val mktCap = quote.mktCap ?: 0.0
         val imageUrl = BuildConfig.baseImageUrl + coin.coin?.imageUrl
 
@@ -65,15 +65,15 @@ fun mapResponseToCoinList(quoteList: List<QuoteDto>, coinListDto: CoinListDto): 
             toSymbol = toSymbol,
             price = price,
             lastUpdate = lastUpdate,
-            volume24hour = volume24hour,
-            volume24hourto = volume24hourto,
+            volume24Hour = volume24Hour,
+            volume24hourTo = volume24HourTo,
             mktCap = mktCap,
-            open24hour = open24hour,
-            high24hour = high24hour,
-            low24hour = low24hour,
-            changepct24hour = changepct24hour,
-            changepcthour = changepcthour,
-            imageUrl = imageUrl
+            open24Hour = open24Hour,
+            high24Hour = high24Hour,
+            low24Hour = low24Hour,
+            changePct24Hour = changePct24Hour,
+            changePctHour = changePctHour,
+            imageUrl = imageUrl,
         )
         result.add(coinEntity)
     }
@@ -90,15 +90,15 @@ fun Coin.toCoinEntity(): CoinEntity = with(this) {
         toSymbol = toSymbol,
         price = price,
         lastUpdate = lastUpdate,
-        volume24hour = volume24hour,
-        volume24hourto = volume24hourto,
+        volume24Hour = volume24Hour,
+        volume24hourTo = volume24hourTo,
         mktCap = mktCap,
-        open24hour = open24hour,
-        high24hour = high24hour,
-        low24hour = low24hour,
-        changepct24hour = changepct24hour,
-        changepcthour = changepcthour,
-        imageUrl = imageUrl
+        open24Hour = open24Hour,
+        high24Hour = high24Hour,
+        low24Hour = low24Hour,
+        changePct24Hour = changePct24Hour,
+        changePctHour = changePctHour,
+        imageUrl = imageUrl,
     )
 }
 
@@ -111,15 +111,15 @@ fun CoinEntity.toCoin(): Coin = with(this) {
         toSymbol = toSymbol,
         price = price,
         lastUpdate = lastUpdate,
-        volume24hour = volume24hour,
-        volume24hourto = volume24hourto,
+        volume24Hour = volume24Hour,
+        volume24hourTo = volume24hourTo,
         mktCap = mktCap,
-        open24hour = open24hour,
-        high24hour = high24hour,
-        low24hour = low24hour,
-        changepct24hour = changepct24hour,
-        changepcthour = changepcthour,
-        imageUrl = imageUrl
+        open24Hour = open24Hour,
+        high24Hour = high24Hour,
+        low24Hour = low24Hour,
+        changePct24Hour = changePct24Hour,
+        changePctHour = changePctHour,
+        imageUrl = imageUrl,
     )
 }
 
@@ -132,15 +132,15 @@ fun Coin.toSearchCoinEntity(): SearchCoinEntity = with(this) {
         toSymbol = toSymbol,
         price = price,
         lastUpdate = lastUpdate,
-        volume24hour = volume24hour,
-        volume24hourto = volume24hourto,
+        volume24Hour = volume24Hour,
+        volume24hourTo = volume24hourTo,
         mktCap = mktCap,
-        open24hour = open24hour,
-        high24hour = high24hour,
-        low24hour = low24hour,
-        changepct24hour = changepct24hour,
-        changepcthour = changepcthour,
-        imageUrl = imageUrl
+        open24Hour = open24Hour,
+        high24Hour = high24Hour,
+        low24Hour = low24Hour,
+        changePct24Hour = changePct24Hour,
+        changePctHour = changePctHour,
+        imageUrl = imageUrl,
     )
 }
 
@@ -153,39 +153,14 @@ fun SearchCoinEntity.toCoin(): Coin = with(this) {
         toSymbol = toSymbol,
         price = price,
         lastUpdate = lastUpdate,
-        volume24hour = volume24hour,
-        volume24hourto = volume24hourto,
+        volume24Hour = volume24Hour,
+        volume24hourTo = volume24hourTo,
         mktCap = mktCap,
-        open24hour = open24hour,
-        high24hour = high24hour,
-        low24hour = low24hour,
-        changepct24hour = changepct24hour,
-        changepcthour = changepcthour,
-        imageUrl = imageUrl
+        open24Hour = open24Hour,
+        high24Hour = high24Hour,
+        low24Hour = low24Hour,
+        changePct24Hour = changePct24Hour,
+        changePctHour = changePctHour,
+        imageUrl = imageUrl,
     )
-}
-
-fun Double.formatCurrencyToDisplay(): String {
-    val decimalFormat = NumberFormat.getInstance(Locale.US).also { it.maximumFractionDigits = 6 }
-    return try {
-        when {
-            this == 1.0 -> String.format("%.1f", this)
-            else -> decimalFormat.format(this)
-        }
-    } catch (e: Exception) {
-        throw e
-    }
-}
-
-fun Double.formatBigDecimalsToDisplay(): String {
-    return try {
-        when {
-            this >= 1000000000.0 -> String.format("%.2fB", this / 1000000000)
-            this >= 1000000.0 -> String.format("%.2fM", this / 1000000)
-            this >=1000.0 -> String.format("%.2fK", this / 1000)
-            else -> this.toString()
-        }
-    } catch (e: Exception) {
-        throw e
-    }
 }
