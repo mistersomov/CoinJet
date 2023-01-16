@@ -6,7 +6,7 @@ sealed class SearchEvent {
 
     object Hide : SearchEvent()
 
-    object Click : SearchEvent()
+    object RequestFocus : SearchEvent()
 
     data class LaunchSearch(val query: String) : SearchEvent()
 
