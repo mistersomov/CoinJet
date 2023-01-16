@@ -65,10 +65,6 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    fun hideSearch() {
-        _searchViewState.value = SearchViewState.Hide
-    }
-
     fun cancelSimpleDetailsJob() {
         hideSimpleDetails()
         simpleDetailsJob.cancel()
@@ -80,7 +76,12 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun cancelSearchJob() {
+        hideSearch()
         searchJob.cancel()
+    }
+
+    private fun hideSearch() {
+        _searchViewState.value = SearchViewState.Hide
     }
 
     private fun fetchData() {
@@ -96,9 +97,6 @@ class CoinViewModel @Inject constructor(
 
     private fun performCoinClick(symbol: String) {
         cancelSearchJob()
-        if (_searchViewState.value !is SearchViewState.Hide) {
-            hideSearch()
-        }
         if (_coinDetailsViewState.value is CoinDetailsViewState.SimpleDetails) {
             simpleDetailsJob.cancel()
         }

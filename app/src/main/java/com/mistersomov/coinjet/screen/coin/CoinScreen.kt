@@ -62,13 +62,13 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                 placeholderText = stringResource(id = R.string.crypto_search_placeholder),
                 onFocusChanged = {
                     with(viewModel) {
-                        cancelSimpleDetailsJob()
                         obtainSearchEvent(SearchEvent.RequestFocus)
+                        cancelSimpleDetailsJob()
                     }
                     scope.launch { scaffoldState.reveal() }
                 },
                 onValueChanged = { viewModel.obtainSearchEvent(SearchEvent.LaunchSearch(it)) },
-                onCancelClicked = { viewModel.hideSearch() },
+                onCancelClicked = { viewModel.obtainSearchEvent(SearchEvent.Hide) },
                 onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.RequestFocus) },
             )
             Column(
@@ -133,7 +133,6 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                                 scope.launch { scaffoldState.reveal() }
                                 with(viewModel) {
                                     obtainEvent(CoinEvent.Click(it))
-                                    hideSearch()
                                 }
                             }
                         )
