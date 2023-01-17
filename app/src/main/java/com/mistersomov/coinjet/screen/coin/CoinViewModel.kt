@@ -58,7 +58,7 @@ class CoinViewModel @Inject constructor(
     fun obtainSearchEvent(event: SearchEvent) {
         when (event) {
             is SearchEvent.Hide -> hideSearch()
-            is SearchEvent.RequestFocus -> showRecentSearch()
+            is SearchEvent.ShowRecentSearch -> showRecentSearch()
             is SearchEvent.LaunchSearch -> getCoinListBySearch(event.query)
             is SearchEvent.Save -> saveCoinToCache(event.coin)
             is SearchEvent.ClearCache -> deleteSearchList()
@@ -71,7 +71,6 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun cancelRecentSearchJob() {
-        hideSearch()
         recentSearchJob.cancel()
     }
 
@@ -96,14 +95,16 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun performCoinClick(symbol: String) {
-        cancelSearchJob()
-        if (_coinDetailsViewState.value is CoinDetailsViewState.SimpleDetails) {
+        if (simpleDetailsJob.isActive) {
             simpleDetailsJob.cancel()
         }
         viewModelScope.launch(simpleDetailsJob) {
             while (isActive) {
                 getCoinBySymbolUseCase(symbol).collect { coin ->
                     _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
+                    if (searchJob.isActive) {
+                        cancelSearchJob()
+                    }
                 }
             }
         }
@@ -130,7 +131,7 @@ class CoinViewModel @Inject constructor(
     private fun getCoinListBySearch(query: String) {
         viewModelScope.launch(searchJob + defaultDispatcher) {
             if (query.isBlank()) {
-                showRecentSearch()
+                //showRecentSearch()
                 cancelSearchJob()
             } else {
                 flow {
@@ -151,8 +152,8 @@ class CoinViewModel @Inject constructor(
     }
 
     private fun saveCoinToCache(coin: Coin) {
+        cancelRecentSearchJob()
         viewModelScope.launch {
-            cancelRecentSearchJob()
             saveCoinToCacheUseCase(coin)
         }
     }
