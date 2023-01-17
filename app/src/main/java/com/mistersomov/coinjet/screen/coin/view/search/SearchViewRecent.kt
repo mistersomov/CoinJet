@@ -26,9 +26,7 @@ fun SearchViewRecent(
     val recentSearchList = viewState.recentSearchList
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

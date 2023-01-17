@@ -35,8 +35,7 @@ fun SearchViewGlobal(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center
     ) {
         Text(

@@ -51,7 +51,8 @@ class CoinRepositoryImpl @Inject constructor(
     override suspend fun getCoinListByName(name: String): List<Coin> {
         return withContext(defaultDispatcher) {
             getCoinListFromCache()
-                .sortedBy { calculateLevenstain(name.lowercase(), it.fullName.lowercase()) }
+                .filter { it.fullName.lowercase().contains(name.lowercase()) }
+                .sortedByDescending { it.mktCap }
                 .distinctBy { it.symbol }
         }
     }
@@ -59,7 +60,8 @@ class CoinRepositoryImpl @Inject constructor(
     override suspend fun getCoinListBySymbol(symbol: String): List<Coin> {
         return withContext(defaultDispatcher) {
             getCoinListFromCache()
-                .sortedBy { calculateLevenstain(symbol.lowercase(), it.symbol.lowercase()) }
+                .filter { it.symbol.lowercase().contains(symbol.lowercase()) }
+                .sortedByDescending { it.mktCap }
                 .distinctBy { it.symbol }
         }
     }
@@ -88,24 +90,5 @@ class CoinRepositoryImpl @Inject constructor(
 
     private suspend fun saveCoinListToCache(coinList: List<Coin>) {
         localDataSource.saveCoinListToCache(coinList.map { coin -> coin.toCoinEntity() })
-    }
-
-    private fun calculateLevenstain(query: String, coinName: String): Int {
-        val di1 = IntArray(coinName.length + 1)
-        val di = IntArray(coinName.length + 1)
-        for (j in 0..coinName.length) {
-            di[j] = j
-        }
-        for (i in 1..query.length) {
-            System.arraycopy(di, 0, di1, 0, di1.size)
-            di[0] = i
-            for (j in 1..coinName.length) {
-                val cost = if (query[i - 1] != coinName[j - 1]) 1 else 0
-                di[j] = (di1[j] + 1)
-                    .coerceAtMost(di[j - 1] + 1)
-                    .coerceAtMost(di1[j - 1] + cost)
-            }
-        }
-        return di[di.size - 1]
     }
 }
