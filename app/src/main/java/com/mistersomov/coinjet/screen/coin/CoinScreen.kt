@@ -14,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -61,61 +60,65 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                     .padding(8.dp),
                 placeholderText = stringResource(id = R.string.crypto_search_placeholder),
                 onFocusChanged = {
+                    scope.launch { scaffoldState.reveal() }
                     with(viewModel) {
-                        obtainSearchEvent(SearchEvent.RequestFocus)
+                        obtainSearchEvent(SearchEvent.ShowRecentSearch)
                         cancelSimpleDetailsJob()
                     }
-                    scope.launch { scaffoldState.reveal() }
                 },
                 onValueChanged = { viewModel.obtainSearchEvent(SearchEvent.LaunchSearch(it)) },
                 onCancelClicked = { viewModel.obtainSearchEvent(SearchEvent.Hide) },
-                onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.RequestFocus) },
+                onRemoveQuery = { viewModel.obtainSearchEvent(SearchEvent.ShowRecentSearch) },
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, top = 10.dp, end = 8.dp),
+                    .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 when (val currentSearchState = searchViewState.value) {
-                    is SearchViewState.Hide -> {  }
+                    is SearchViewState.Hide -> {}
                     is SearchViewState.NoItems -> SearchViewNoItems()
                     is SearchViewState.FirstSearch -> SearchViewFirst()
-                    is SearchViewState.Recent -> SearchViewRecent(
-                        viewState = currentSearchState,
-                        onItemClicked = {
-                            scope.launch { scaffoldState.reveal() }
-                            viewModel.obtainEvent(CoinEvent.Click(it.symbol))
-                        },
-                        onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
-                    )
-                    is SearchViewState.Global -> SearchViewGlobal(
-                        viewState = currentSearchState,
-                        onItemClicked = {
-                            scope.launch { scaffoldState.reveal() }
-                            with(viewModel) {
-                                obtainSearchEvent(SearchEvent.Save(it))
-                                obtainEvent(CoinEvent.Click(it.symbol))
-                            }
-                        })
+                    is SearchViewState.Recent ->
+                        AnimatedVisibility(visible = true) {
+                            SearchViewRecent(
+                                viewState = currentSearchState,
+                                onItemClicked = {
+                                    scope.launch { scaffoldState.reveal() }
+                                    viewModel.obtainEvent(CoinEvent.Click(it.symbol))
+                                },
+                                onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
+                            )
+                        }
+                    is SearchViewState.Global ->
+                        AnimatedVisibility(visible = true) {
+                            SearchViewGlobal(
+                                viewState = currentSearchState,
+                                onItemClicked = {
+                                    scope.launch { scaffoldState.reveal() }
+                                    with(viewModel) {
+                                        obtainSearchEvent(SearchEvent.Save(it))
+                                        obtainEvent(CoinEvent.Click(it.symbol))
+                                    }
+                                })
+                        }
                 }
             }
             when (val current = detailsViewState.value) {
                 is CoinDetailsViewState.SimpleDetails ->
-                    AnimatedVisibility(visible = true) {
-                        CoinViewSimpleDetails(
-                            modifier = Modifier.padding(
-                                horizontal = 8.dp
-                            ),
-                            coin = current.coin,
-                            onCancelClicked = {
-                                with(viewModel) {
-                                    cancelSimpleDetailsJob()
-                                }
+                    CoinViewSimpleDetails(
+                        modifier = Modifier.padding(
+                            horizontal = 8.dp
+                        ),
+                        coin = current.coin,
+                        onCancelClicked = {
+                            with(viewModel) {
+                                cancelSimpleDetailsJob()
                             }
-                        )
-                    }
+                        }
+                    )
                 else -> Unit
             }
         },
@@ -125,18 +128,16 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
             when (val currentState = viewState.value) {
                 is CoinViewState.Loading -> CoinViewLoading()
                 is CoinViewState.Display ->
-                    AnimatedVisibility(visible = true) {
-                        CoinViewDisplay(
-                            navController = navController,
-                            viewState = currentState,
-                            onCoinClicked = {
-                                scope.launch { scaffoldState.reveal() }
-                                with(viewModel) {
-                                    obtainEvent(CoinEvent.Click(it))
-                                }
+                    CoinViewDisplay(
+                        navController = navController,
+                        viewState = currentState,
+                        onCoinClicked = {
+                            scope.launch { scaffoldState.reveal() }
+                            with(viewModel) {
+                                obtainEvent(CoinEvent.Click(it))
                             }
-                        )
-                    }
+                        }
+                    )
                 is CoinViewState.NoItems -> Unit
                 //is CryptoViewState.Error -> CryptoViewError()
                 else -> throw NotImplementedError(
