@@ -1,7 +1,8 @@
 <resources>
     <string name="crypto_search_placeholder" translatable="false">#BTC, Bitcoin</string>
     <string name="crypto_favorites">Favorites</string>
-    <string name="crypto_last_update">Updated: %s </string>
+    <string name="coin_price_label">Price</string>
+    <string name="coin_24h_changes_label">24h%</string>
 
     <!--Coin Details-->
     <string name="coin_details_high_day">High Day</string>

@@ -1,8 +1,8 @@
 package com.mistersomov.coinjet.data.datasource
 
-import com.mistersomov.coinjet.domain.model.Coin
+import com.mistersomov.coinjet.data.network.model.CoinInfoDto
 import kotlinx.coroutines.flow.Flow
 
 interface RemoteDataSource {
-    fun getLatestCoinList(): Flow<List<Coin>>
+    fun fetchLatestCoinList(): Flow<List<CoinInfoDto>>
 }

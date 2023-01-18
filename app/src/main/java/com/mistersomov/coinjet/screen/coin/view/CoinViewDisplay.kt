@@ -51,7 +51,7 @@ fun CoinViewDisplay(
                 content = {
                     CoinDetails(coin = coin)
                 }) {
-                onCoinClicked.invoke(coin.symbol)
+                onCoinClicked.invoke(coin.id)
             }
         }
     }
@@ -61,7 +61,7 @@ fun CoinViewDisplay(
 fun CoinDetails(coin: Coin) {
     val imageModel by remember { mutableStateOf(coin.imageUrl) }
     val name by remember { mutableStateOf(coin.symbol) }
-    val fullName by remember { mutableStateOf(coin.fullName) }
+    val fullName by remember { mutableStateOf(coin.name) }
 
     AsyncImage(
         model = imageModel,
@@ -107,23 +107,26 @@ fun CoinDetails(coin: Coin) {
                 maxLines = 1
             )
         }
-        Column(
+        Row(
             modifier = Modifier.padding(top = 14.dp, bottom = 6.dp),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            val lastUpdate = String.format(
-                stringResource(id = R.string.crypto_last_update),
-                coin.lastUpdate
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = coin.price.formatCurrencyToDisplay(),
+                    text = stringResource(id = R.string.coin_price_label),
+                    color = CoinJetTheme.colors.onSurface,
+                    style = CoinJetTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+                Text(
+                    text = coin.priceUsd.formatCurrencyToDisplay(),
                     color = animateDigitColor(
-                        digit = coin.price,
+                        digit = coin.priceUsd,
                         initialColor = CoinJetTheme.colors.onSurface
                     ),
                     style = CoinJetTheme.typography.titleMedium,
@@ -131,18 +134,23 @@ fun CoinDetails(coin: Coin) {
                     textAlign = TextAlign.Start,
                     maxLines = 1
                 )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.coin_24h_changes_label),
+                    color = CoinJetTheme.colors.onSurface,
+                    style = CoinJetTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
                 PercentChanging(
                     modifier = Modifier.padding(start = 6.dp),
-                    percent = coin.changePct24Hour.toDouble(),
+                    percent = coin.changePercent24Hr,
                 )
             }
-            Text(
-                text = lastUpdate,
-                color = CoinJetTheme.colors.onSurfaceVariant,
-                style = CoinJetTheme.typography.bodySmall,
-                textAlign = TextAlign.End,
-                maxLines = 1
-            )
         }
     }
 }
@@ -155,16 +163,10 @@ fun PercentChanging(
     val percentValue by remember { mutableStateOf(percent) }
 
     val backgroundColor = if (percentValue == 0.0) {
-        CoinJetTheme.colors.surfaceVariant
+        CoinJetTheme.colors.onSurfaceVariant
     } else if (percent > 0) {
         CoinJetTheme.colors.green
-    } else CoinJetTheme.colors.errorContainer
-
-    val textColor = if (percentValue == 0.0) {
-        CoinJetTheme.colors.onSurfaceVariant
-    } else if (percentValue > 0) {
-        CoinJetTheme.colors.onGreen
-    } else CoinJetTheme.colors.error
+    } else CoinJetTheme.colors.red
 
     Box(
         modifier = modifier
@@ -180,7 +182,7 @@ fun PercentChanging(
                 .fillMaxSize()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             text = "${percent.asPercentage()}%",
-            color = textColor,
+            color = CoinJetTheme.colors.surface,
             style = CoinJetTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center

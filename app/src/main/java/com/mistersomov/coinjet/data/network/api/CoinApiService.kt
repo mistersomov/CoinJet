@@ -1,36 +1,15 @@
 package com.mistersomov.coinjet.data.network.api
 
-import com.mistersomov.coinjet.data.network.model.CoinListDto
-import com.mistersomov.coinjet.data.network.model.QuoteJsonContainerDto
+import com.mistersomov.coinjet.data.network.model.AssetsDto
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface CoinApiService {
 
-    @GET(ENDPOINT_COIN_LIST)
-    suspend fun getTopCoinList(
-        @Query(QUERY_PARAM_LIMIT) limit: Int = QUERY_PARAM_LIMIT_DEFAULT,
-        @Query(QUERY_PARAM_TO_SYMBOL) toSymbol: String = QUERY_PARAM_TO_SYMBOL_DEFAULT,
-    ): CoinListDto
-
-    @GET(ENDPOINT_QUOTE_LIST)
-    suspend fun getQuoteList(
-        @Query(QUERY_PARAM_FROM_SYMBOLS) fromSymbols: String,
-        @Query(QUERY_PARAM_TO_SYMBOLS) toSymbols: String = QUERY_PARAM_TO_SYMBOL_DEFAULT,
-        @Query(QUERY_PARAM_RELAXED_VALIDATION) relaxed: Boolean = true,
-    ): QuoteJsonContainerDto
+    @GET(ENDPOINT_ASSETS)
+    suspend fun getTopCoinList(): AssetsDto
 
     companion object {
         //Endpoints
-        private const val ENDPOINT_COIN_LIST = "/data/top/totalvolfull"
-        private const val ENDPOINT_QUOTE_LIST = "/data/pricemultifull"
-        //Query params
-        private const val QUERY_PARAM_LIMIT = "limit"
-        private const val QUERY_PARAM_LIMIT_DEFAULT = 100
-        private const val QUERY_PARAM_TO_SYMBOL = "tsym"
-        private const val QUERY_PARAM_FROM_SYMBOLS = "fsyms"
-        private const val QUERY_PARAM_TO_SYMBOLS = "tsyms"
-        private const val QUERY_PARAM_TO_SYMBOL_DEFAULT = "USDT"
-        private const val QUERY_PARAM_RELAXED_VALIDATION = "relaxedValidation"
+        private const val ENDPOINT_ASSETS = "/v2/assets"
     }
 }

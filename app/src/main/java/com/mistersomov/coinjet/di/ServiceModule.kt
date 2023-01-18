@@ -25,7 +25,7 @@ object ServiceModule {
         val interceptorList: ArrayList<Interceptor> = ArrayList(interceptors)
         return OkHttpClient.Builder()
             .addInterceptor(interceptorList, CoinProtocolInterceptor::class.java)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(8, TimeUnit.SECONDS)
             .build()
     }
 
