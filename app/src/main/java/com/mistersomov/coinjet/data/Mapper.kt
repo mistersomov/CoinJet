@@ -2,6 +2,7 @@ package com.mistersomov.coinjet.data
 
 import com.mistersomov.coinjet.BuildConfig
 import com.mistersomov.coinjet.data.database.entity.CoinInfoDbModel
+import com.mistersomov.coinjet.data.database.entity.FavoriteDbModel
 import com.mistersomov.coinjet.data.database.entity.SearchCoinDbModel
 import com.mistersomov.coinjet.data.network.model.CoinInfoDto
 import com.mistersomov.coinjet.domain.model.Coin
@@ -68,6 +69,37 @@ fun Coin.toSearchCoinDbModel(time: DateTime): SearchCoinDbModel = SearchCoinDbMo
 )
 
 fun SearchCoinDbModel.toEntity(): Coin = Coin(
+    id = this.id,
+    rank = this.rank,
+    symbol = this.symbol,
+    name = this.name,
+    supply = this.supply,
+    marketCapUsd = this.marketCapUsd,
+    volumeUsd24Hr = this.volumeUsd24Hr,
+    priceUsd = this.priceUsd,
+    changePercent24Hr = this.changePercent24Hr,
+    vwap24Hr = this.vwap24Hr,
+    imageUrl = this.imageUrl,
+    toSymbol = this.toSymbol,
+)
+
+fun Coin.toFavoriteDbModel(time: DateTime): FavoriteDbModel = FavoriteDbModel(
+    id = this.id,
+    rank = this.rank,
+    symbol = this.symbol,
+    name = this.name,
+    supply = this.supply,
+    marketCapUsd = this.marketCapUsd,
+    volumeUsd24Hr = this.volumeUsd24Hr,
+    priceUsd = this.priceUsd,
+    changePercent24Hr = this.changePercent24Hr,
+    vwap24Hr = this.vwap24Hr,
+    imageUrl = this.imageUrl,
+    toSymbol = this.toSymbol,
+    time = time.millis,
+)
+
+fun FavoriteDbModel.toEntity(): Coin = Coin(
     id = this.id,
     rank = this.rank,
     symbol = this.symbol,

@@ -13,7 +13,7 @@ interface SearchCoinDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertByEntity(entity: SearchCoinDbModel)
 
-    @Query("SELECT * from ${SearchCoinDbModel.TABLE_SEARCH_COIN_NAME} ORDER BY rank DESC")
+    @Query("SELECT * from ${SearchCoinDbModel.TABLE_SEARCH_COIN_NAME}")
     fun getAll(): Flow<List<SearchCoinDbModel>>
 
     @Query("DELETE from ${SearchCoinDbModel.TABLE_SEARCH_COIN_NAME}")

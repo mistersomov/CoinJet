@@ -1,6 +1,7 @@
 package com.mistersomov.coinjet.data.repository
 
 import com.mistersomov.coinjet.data.database.entity.CoinInfoDbModel
+import com.mistersomov.coinjet.data.database.entity.FavoriteDbModel
 import com.mistersomov.coinjet.data.datasource.LocalDataSource
 import com.mistersomov.coinjet.data.datasource.RemoteDataSource
 import com.mistersomov.coinjet.data.toDbModel
@@ -45,9 +46,9 @@ class CoinRepositoryImpl @Inject constructor(
 
     override fun getRecentSearchList(): Flow<List<Coin>> {
         return localDataSource.getRecentSearchList()
-            .map { entityList ->
+            .map { dbModelList ->
                 when {
-                    entityList.isNotEmpty() -> entityList
+                    dbModelList.isNotEmpty() -> dbModelList
                         .distinctBy { it.symbol }
                         .sortedByDescending { dbModel -> dbModel.time }
                         .map { dbModel -> dbModel.toEntity() }
@@ -95,5 +96,30 @@ class CoinRepositoryImpl @Inject constructor(
 
     private suspend fun saveCoinListToCache(coinList: List<CoinInfoDbModel>) {
         localDataSource.saveCoinListToCache(coinList)
+    }
+
+    override suspend fun addCoinToFavorite(coin: Coin, currentTime: DateTime) {
+        withContext(defaultDispatcher) {
+            localDataSource.addCoinToFavorite(coin, currentTime)
+        }
+    }
+
+    override fun getFavoriteList(): Flow<List<Coin>> {
+        return localDataSource.getFavoriteList()
+            .map { dbList ->
+                when {
+                    dbList.isNotEmpty() -> dbList
+                        .sortedByDescending { it.time }
+                        .map { it.toEntity() }
+                    else -> emptyList()
+                }
+            }
+            .flowOn(defaultDispatcher)
+    }
+
+    override suspend fun clearFavoriteList() {
+        withContext(defaultDispatcher) {
+            localDataSource.clearFavoriteList()
+        }
     }
 }

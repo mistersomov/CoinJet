@@ -20,7 +20,7 @@ fun SearchViewNoItems() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(id = R.string.crypto_search_headline_title),
+            text = stringResource(id = R.string.coin_search_headline_title),
             color = CoinJetTheme.colors.surfaceVariant,
             style = CoinJetTheme.typography.titleMedium
         )
@@ -34,7 +34,7 @@ fun SearchViewNoItems() {
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .align(Alignment.CenterHorizontally),
-            text = stringResource(id = R.string.crypto_search_headline_title_no_items),
+            text = stringResource(id = R.string.coin_search_headline_title_no_items),
             color = CoinJetTheme.colors.surfaceVariant,
             style = CoinJetTheme.typography.titleSmall
         )

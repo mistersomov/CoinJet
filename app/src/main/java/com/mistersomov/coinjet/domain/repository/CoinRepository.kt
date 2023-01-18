@@ -20,4 +20,10 @@ interface CoinRepository {
     fun getRecentSearchList(): Flow<List<Coin>>
 
     suspend fun clearSearchList()
+
+    suspend fun addCoinToFavorite(coin: Coin, currentTime: DateTime)
+
+    fun getFavoriteList(): Flow<List<Coin>>
+
+    suspend fun clearFavoriteList()
 }

@@ -3,7 +3,7 @@ object Config {
     const val minSDK = 26
     const val targetSDK = 33
     const val versionCode = 4
-    const val versionName = "1.1.2"
+    const val versionName = "0.1.3"
     const val packageName = "com.mistersomov.coinjet"
 
     const val cryptoBaseUrl = "https://api.coincap.io"

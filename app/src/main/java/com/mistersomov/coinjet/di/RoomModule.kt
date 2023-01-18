@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.mistersomov.coinjet.data.database.CoinjetDatabase
 import com.mistersomov.coinjet.data.database.dao.CoinDao
+import com.mistersomov.coinjet.data.database.dao.FavoriteDao
 import com.mistersomov.coinjet.data.database.dao.SearchCoinDao
 import dagger.Module
 import dagger.Provides
@@ -35,4 +36,8 @@ object RoomModule {
     @Singleton
     @Provides
     fun provideSearchDao(database: CoinjetDatabase): SearchCoinDao = database.searchDao()
+
+    @Singleton
+    @Provides
+    fun provideFavoriteDao(database: CoinjetDatabase): FavoriteDao = database.favoriteDao()
 }

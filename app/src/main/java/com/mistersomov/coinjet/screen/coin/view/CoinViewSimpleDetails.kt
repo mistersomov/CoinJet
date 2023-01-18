@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 fun CoinViewSimpleDetails(
     modifier: Modifier = Modifier,
     coin: Coin,
+    onAddToFavorite: () -> Unit,
     onCancelClicked: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -73,6 +74,7 @@ fun CoinViewSimpleDetails(
                         else -> R.drawable.favorite_outline
                     }
                 }
+                onAddToFavorite.invoke()
             }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = favoriteIconId.value),
