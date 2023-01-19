@@ -3,11 +3,11 @@ package com.mistersomov.coinjet.data.database
 import androidx.room.*
 import com.mistersomov.coinjet.data.database.dao.CoinDao
 import com.mistersomov.coinjet.data.database.dao.SearchCoinDao
-import com.mistersomov.coinjet.data.database.entity.CoinEntity
-import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
+import com.mistersomov.coinjet.data.database.entity.CoinInfoDbModel
+import com.mistersomov.coinjet.data.database.entity.SearchCoinDbModel
 
 @Database(
-    entities = [CoinEntity::class, SearchCoinEntity::class],
+    entities = [CoinInfoDbModel::class, SearchCoinDbModel::class],
     version = 1,
 )
 abstract class CoinjetDatabase : RoomDatabase() {

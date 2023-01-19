@@ -38,7 +38,7 @@ data class CoinJetColor(
     val surfaceTintColor: Color,
     val yellow: Color,
     val green: Color,
-    val onGreen: Color,
+    val red: Color,
 )
 
 val Inter = FontFamily(

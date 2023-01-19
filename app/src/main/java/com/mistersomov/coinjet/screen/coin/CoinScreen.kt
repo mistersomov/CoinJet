@@ -52,12 +52,12 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
         appBar = { },
         frontLayerScrimColor = Color.Unspecified,
         backLayerBackgroundColor = CoinJetTheme.colors.primary,
-        peekHeight = 80.dp,
+        peekHeight = 90.dp,
         backLayerContent = {
             Search(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 placeholderText = stringResource(id = R.string.crypto_search_placeholder),
                 onFocusChanged = {
                     scope.launch { scaffoldState.reveal() }
@@ -73,7 +73,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -87,7 +87,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                                 viewState = currentSearchState,
                                 onItemClicked = {
                                     scope.launch { scaffoldState.reveal() }
-                                    viewModel.obtainEvent(CoinEvent.Click(it.symbol))
+                                    viewModel.obtainEvent(CoinEvent.Click(it.id))
                                 },
                                 onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
                             )
@@ -100,7 +100,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                                     scope.launch { scaffoldState.reveal() }
                                     with(viewModel) {
                                         obtainSearchEvent(SearchEvent.Save(it))
-                                        obtainEvent(CoinEvent.Click(it.symbol))
+                                        obtainEvent(CoinEvent.Click(it.id))
                                     }
                                 })
                         }
@@ -110,7 +110,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                 is CoinDetailsViewState.SimpleDetails ->
                     CoinViewSimpleDetails(
                         modifier = Modifier.padding(
-                            horizontal = 8.dp
+                            horizontal = 16.dp
                         ),
                         coin = current.coin,
                         onCancelClicked = {
@@ -133,9 +133,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                         viewState = currentState,
                         onCoinClicked = {
                             scope.launch { scaffoldState.reveal() }
-                            with(viewModel) {
-                                obtainEvent(CoinEvent.Click(it))
-                            }
+                            viewModel.obtainEvent(CoinEvent.Click(it))
                         }
                     )
                 is CoinViewState.NoItems -> Unit

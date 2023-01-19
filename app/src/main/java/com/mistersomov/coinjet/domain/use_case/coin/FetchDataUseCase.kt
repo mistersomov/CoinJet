@@ -13,6 +13,6 @@ class FetchDataUseCase @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
     operator fun invoke(): Flow<List<Coin>> {
-        return repository.getLatestCoinList().flowOn(defaultDispatcher)
+        return repository.fetchLatestCoinList().flowOn(defaultDispatcher)
     }
 }

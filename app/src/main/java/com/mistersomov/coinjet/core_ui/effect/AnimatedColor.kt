@@ -12,9 +12,9 @@ fun animateDigitColor(digit: Double, initialColor: Color): Color {
     val targetColor = if (digit == previousDigit) {
         initialColor
     } else if (digit > previousDigit) {
-        CoinJetTheme.colors.onGreen
+        CoinJetTheme.colors.green
     } else {
-        CoinJetTheme.colors.error
+        CoinJetTheme.colors.red
     }
     val priceColor = remember { Animatable(initialColor) }
     val duration = 2000
