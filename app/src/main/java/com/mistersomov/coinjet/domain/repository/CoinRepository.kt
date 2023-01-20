@@ -2,19 +2,28 @@ package com.mistersomov.coinjet.domain.repository
 
 import com.mistersomov.coinjet.domain.model.Coin
 import kotlinx.coroutines.flow.Flow
+import org.joda.time.DateTime
 
 interface CoinRepository {
-    fun getLatestCoinList(): Flow<List<Coin>>
+    fun fetchLatestCoinList(): Flow<List<Coin>>
 
-    fun getCoinBySymbol(symbol: String): Flow<Coin>
+    suspend fun getCoinListFromCache(): List<Coin>
+
+    fun getCoinById(id: String): Flow<Coin>
 
     suspend fun getCoinListByName(name: String): List<Coin>
 
     suspend fun getCoinListBySymbol(symbol: String): List<Coin>
 
-    suspend fun saveSearchCoinToCache(coin: Coin)
+    suspend fun saveSearchCoinToCache(coin: Coin, time: DateTime)
 
     fun getRecentSearchList(): Flow<List<Coin>>
 
     suspend fun clearSearchList()
+
+    suspend fun addCoinToFavorite(coin: Coin, currentTime: DateTime)
+
+    fun getFavoriteList(): Flow<List<Coin>>
+
+    suspend fun clearFavoriteList()
 }

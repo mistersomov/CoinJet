@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class GetRecentSearchListUseCase @Inject constructor(
+class GetCoinByIdUseCase @Inject constructor(
     private val repository: CoinRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    operator fun invoke(): Flow<List<Coin>> {
-        return repository.getRecentSearchList().flowOn(defaultDispatcher)
+    operator fun invoke(id: String): Flow<Coin> {
+        return repository.getCoinById(id).flowOn(defaultDispatcher)
     }
 }

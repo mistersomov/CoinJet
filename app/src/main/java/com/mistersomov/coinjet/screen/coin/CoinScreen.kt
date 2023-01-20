@@ -24,9 +24,13 @@ import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.core_ui.component.Search
 import com.mistersomov.coinjet.screen.coin.model.*
+import com.mistersomov.coinjet.screen.coin.model.favorite.FavoriteViewState
+import com.mistersomov.coinjet.screen.coin.model.search.SearchEvent
+import com.mistersomov.coinjet.screen.coin.model.search.SearchViewState
 import com.mistersomov.coinjet.screen.coin.view.CoinViewDisplay
 import com.mistersomov.coinjet.screen.coin.view.CoinViewLoading
 import com.mistersomov.coinjet.screen.coin.view.CoinViewSimpleDetails
+import com.mistersomov.coinjet.screen.coin.view.favorite.FavoriteDisplay
 import com.mistersomov.coinjet.screen.coin.view.search.SearchViewFirst
 import com.mistersomov.coinjet.screen.coin.view.search.SearchViewGlobal
 import com.mistersomov.coinjet.screen.coin.view.search.SearchViewNoItems
@@ -36,9 +40,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltViewModel()) {
-    val viewState = viewModel.coinViewState.collectAsState()
+    val viewState = viewModel.coinListViewState.collectAsState()
     val searchViewState = viewModel.searchViewState.collectAsState()
     val detailsViewState = viewModel.coinDetailsViewState.collectAsState()
+    val favoriteViewState = viewModel.favoriteListViewState.collectAsState()
 
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
@@ -57,14 +62,12 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
             Search(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                placeholderText = stringResource(id = R.string.crypto_search_placeholder),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholderText = stringResource(id = R.string.coin_search_placeholder),
                 onFocusChanged = {
                     scope.launch { scaffoldState.reveal() }
-                    with(viewModel) {
-                        obtainSearchEvent(SearchEvent.ShowRecentSearch)
-                        cancelSimpleDetailsJob()
-                    }
+                    viewModel.obtainSearchEvent(SearchEvent.ShowRecentSearch)
+
                 },
                 onValueChanged = { viewModel.obtainSearchEvent(SearchEvent.LaunchSearch(it)) },
                 onCancelClicked = { viewModel.obtainSearchEvent(SearchEvent.Hide) },
@@ -73,7 +76,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -87,7 +90,7 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                                 viewState = currentSearchState,
                                 onItemClicked = {
                                     scope.launch { scaffoldState.reveal() }
-                                    viewModel.obtainEvent(CoinEvent.Click(it.symbol))
+                                    viewModel.obtainEvent(CoinEvent.Click(it.id))
                                 },
                                 onClearClicked = { viewModel.obtainSearchEvent(SearchEvent.ClearCache) }
                             )
@@ -100,23 +103,37 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
                                     scope.launch { scaffoldState.reveal() }
                                     with(viewModel) {
                                         obtainSearchEvent(SearchEvent.Save(it))
-                                        obtainEvent(CoinEvent.Click(it.symbol))
+                                        obtainEvent(CoinEvent.Click(it.id))
                                     }
                                 })
                         }
                 }
             }
+            when (val favoriteState = favoriteViewState.value) {
+                is FavoriteViewState.Display -> FavoriteDisplay(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    viewState = favoriteState,
+                    onCoinClicked = {
+                        viewModel.obtainEvent(CoinEvent.Click(it))
+                    }
+                )
+                else -> FavoriteViewState.Hide
+            }
+
             when (val current = detailsViewState.value) {
                 is CoinDetailsViewState.SimpleDetails ->
                     CoinViewSimpleDetails(
                         modifier = Modifier.padding(
-                            horizontal = 8.dp
+                            horizontal = 16.dp
                         ),
                         coin = current.coin,
+                        onAddToFavorite = {
+                            viewModel.obtainEvent(CoinEvent.AddToFavorite(coin = current.coin))
+                        },
                         onCancelClicked = {
-                            with(viewModel) {
-                                cancelSimpleDetailsJob()
-                            }
+                            viewModel.obtainEvent(CoinEvent.HideSimpleDetails)
                         }
                     )
                 else -> Unit
@@ -126,22 +143,20 @@ fun CoinScreen(navController: NavController, viewModel: CoinViewModel = hiltView
         frontLayerBackgroundColor = CoinJetTheme.colors.surface,
         frontLayerContent = {
             when (val currentState = viewState.value) {
-                is CoinViewState.Loading -> CoinViewLoading()
-                is CoinViewState.Display ->
+                is CoinListViewState.Loading -> CoinViewLoading()
+                is CoinListViewState.Display ->
                     CoinViewDisplay(
                         navController = navController,
                         viewState = currentState,
                         onCoinClicked = {
                             scope.launch { scaffoldState.reveal() }
-                            with(viewModel) {
-                                obtainEvent(CoinEvent.Click(it))
-                            }
+                            viewModel.obtainEvent(CoinEvent.Click(it))
                         }
                     )
-                is CoinViewState.NoItems -> Unit
+                is CoinListViewState.NoItems -> Unit
                 //is CryptoViewState.Error -> CryptoViewError()
                 else -> throw NotImplementedError(
-                    stringResource(id = R.string.crypto_implementation_state_error)
+                    stringResource(id = R.string.coin_implementation_state_error)
                 )
             }
         })

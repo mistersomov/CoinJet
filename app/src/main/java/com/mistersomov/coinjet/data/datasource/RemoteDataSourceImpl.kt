@@ -1,11 +1,8 @@
 package com.mistersomov.coinjet.data.datasource
 
-import com.mistersomov.coinjet.data.mapResponseToCoinList
+import com.mistersomov.coinjet.data.network.model.CoinInfoDto
 import com.mistersomov.coinjet.data.service.CoinService
-import com.mistersomov.coinjet.data.toQuoteList
-import com.mistersomov.coinjet.data.toSimpleCoinString
 import com.mistersomov.coinjet.di.qualifier.IoDispatcher
-import com.mistersomov.coinjet.domain.model.Coin
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -17,16 +14,12 @@ class RemoteDataSourceImpl @Inject constructor(
     private val serviceHolder: CoinService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RemoteDataSource {
-    override fun getLatestCoinList(): Flow<List<Coin>> {
+    override fun fetchLatestCoinList(): Flow<List<CoinInfoDto>> {
         return flow {
             while (true) {
-                val topCoinList = serviceHolder.getService().getTopCoinList()
-                val quoteList = serviceHolder.getService()
-                    .getQuoteList(fromSymbols = topCoinList.toSimpleCoinString())
-                    .toQuoteList()
-                val resultCoinList = mapResponseToCoinList(quoteList, topCoinList)
+                val response = serviceHolder.getService().getTopCoinList()
 
-                emit(resultCoinList)
+                emit(checkNotNull(response.coinList))
                 delay(DELAY)
             }
         }

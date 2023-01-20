@@ -2,28 +2,41 @@ package com.mistersomov.coinjet.screen.coin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mistersomov.coinjet.di.qualifier.DefaultDispatcher
 import com.mistersomov.coinjet.domain.model.Coin
 import com.mistersomov.coinjet.domain.use_case.coin.*
+import com.mistersomov.coinjet.domain.use_case.favorite.AddToFavoriteUseCase
+import com.mistersomov.coinjet.domain.use_case.favorite.ClearFavoriteListUseCase
+import com.mistersomov.coinjet.domain.use_case.favorite.GetFavoriteListUseCase
+import com.mistersomov.coinjet.domain.use_case.search.ClearSearchListUseCase
+import com.mistersomov.coinjet.domain.use_case.search.GetCoinListBySearchUseCase
+import com.mistersomov.coinjet.domain.use_case.search.GetRecentSearchListUseCase
+import com.mistersomov.coinjet.domain.use_case.search.SaveSearchCoinToCacheUseCase
 import com.mistersomov.coinjet.screen.coin.model.*
+import com.mistersomov.coinjet.screen.coin.model.favorite.FavoriteViewState
+import com.mistersomov.coinjet.screen.coin.model.search.SearchEvent
+import com.mistersomov.coinjet.screen.coin.model.search.SearchViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.joda.time.DateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class CoinViewModel @Inject constructor(
     private val fetchDataUseCase: FetchDataUseCase,
-    private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
-    private val saveCoinToCacheUseCase: SaveCoinToCacheUseCase,
+    private val getCoinListFromCacheUseCase: GetCoinListFromCacheUseCase,
+    private val getCoinByIdUseCase: GetCoinByIdUseCase,
+    private val saveSearchCoinToCacheUseCase: SaveSearchCoinToCacheUseCase,
     private val getRecentSearchListUseCase: GetRecentSearchListUseCase,
     private val getCoinListBySearchUseCase: GetCoinListBySearchUseCase,
     private val clearSearchListUseCase: ClearSearchListUseCase,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val addToFavoriteUseCase: AddToFavoriteUseCase,
+    private val getFavoriteListUseCase: GetFavoriteListUseCase,
+    private val clearFavoriteListUseCase: ClearFavoriteListUseCase,
 ) : ViewModel() {
 
-    private var _coinViewState = MutableStateFlow<CoinViewState>(CoinViewState.Loading)
-    val coinViewState: StateFlow<CoinViewState> = _coinViewState
+    private var _coinListViewState = MutableStateFlow<CoinListViewState>(CoinListViewState.Loading)
+    val coinListViewState: StateFlow<CoinListViewState> = _coinListViewState
 
     private var _searchViewState = MutableStateFlow<SearchViewState>(SearchViewState.Hide)
     val searchViewState: StateFlow<SearchViewState> = _searchViewState
@@ -31,6 +44,10 @@ class CoinViewModel @Inject constructor(
     private var _coinDetailsViewState =
         MutableStateFlow<CoinDetailsViewState>(CoinDetailsViewState.Hide)
     val coinDetailsViewState: StateFlow<CoinDetailsViewState> = _coinDetailsViewState
+
+    private var _favoriteListViewState =
+        MutableStateFlow<FavoriteViewState>(FavoriteViewState.Hide)
+    val favoriteListViewState: StateFlow<FavoriteViewState> = _favoriteListViewState
 
     private var recentSearchJob = Job()
         get() {
@@ -47,11 +64,20 @@ class CoinViewModel @Inject constructor(
             if (field.isCancelled) field = Job()
             return field
         }
+    private var favoriteJob = Job()
+        get() {
+            if (field.isCancelled) field = Job()
+            return field
+        }
 
     fun obtainEvent(event: CoinEvent) {
         when (event) {
             is CoinEvent.FetchData -> fetchData()
-            is CoinEvent.Click -> performCoinClick(event.symbol)
+            is CoinEvent.Click -> performCoinClick(event.id)
+            is CoinEvent.HideSimpleDetails -> cancelSimpleDetailsJob()
+            is CoinEvent.AddToFavorite -> addToFavorite(event.coin)
+            is CoinEvent.ShowFavoriteList -> showFavoriteList()
+            is CoinEvent.ClearFavoriteList -> clearFavoriteList()
         }
     }
 
@@ -65,7 +91,7 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    fun cancelSimpleDetailsJob() {
+    private fun cancelSimpleDetailsJob() {
         hideSimpleDetails()
         simpleDetailsJob.cancel()
     }
@@ -85,27 +111,39 @@ class CoinViewModel @Inject constructor(
 
     private fun fetchData() {
         viewModelScope.launch {
-            fetchDataUseCase().collect { coinList ->
-                when {
-                    coinList.isEmpty() -> _coinViewState.value = CoinViewState.NoItems
-                    else -> _coinViewState.value = CoinViewState.Display(coinList = coinList)
+            fetchDataUseCase()
+                .cancellable()
+                .onStart {
+                    if (getCoinListFromCacheUseCase().isNotEmpty()) {
+                        _coinListViewState.value =
+                            CoinListViewState.Display(coinList = getCoinListFromCacheUseCase())
+                    }
+                    showFavoriteList()
                 }
-            }
+                .collect { coinList ->
+                    when {
+                        coinList.isNotEmpty() -> _coinListViewState.value =
+                            CoinListViewState.Display(coinList = coinList)
+                        else -> _coinListViewState.value = CoinListViewState.NoItems
+                    }
+                }
         }
     }
 
-    private fun performCoinClick(symbol: String) {
+    private fun performCoinClick(id: String) {
         if (simpleDetailsJob.isActive) {
             simpleDetailsJob.cancel()
         }
         viewModelScope.launch(simpleDetailsJob) {
             while (isActive) {
-                getCoinBySymbolUseCase(symbol).collect { coin ->
-                    _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
-                    if (searchJob.isActive) {
-                        cancelSearchJob()
+                getCoinByIdUseCase(id)
+                    .cancellable()
+                    .collect { coin ->
+                        _coinDetailsViewState.value = CoinDetailsViewState.SimpleDetails(coin)
+                        if (searchJob.isActive) {
+                            cancelSearchJob()
+                        }
                     }
-                }
             }
         }
     }
@@ -116,12 +154,15 @@ class CoinViewModel @Inject constructor(
 
     private fun showRecentSearch() {
         viewModelScope.launch(recentSearchJob) {
-            getRecentSearchListUseCase().collect { searchList ->
+            getRecentSearchListUseCase().onCompletion {
+                if (simpleDetailsJob.isActive) {
+                    cancelSimpleDetailsJob()
+                }
+            }.collect { searchList ->
                 when {
                     searchList.isNotEmpty() -> _searchViewState.value =
                         SearchViewState.Recent(recentSearchList = searchList)
                     else -> _searchViewState.value = SearchViewState.NoItems
-
                 }
             }
         }
@@ -129,22 +170,28 @@ class CoinViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     private fun getCoinListBySearch(query: String) {
-        viewModelScope.launch(searchJob + defaultDispatcher) {
+        viewModelScope.launch(searchJob) {
             if (query.isBlank()) {
-                //showRecentSearch()
                 cancelSearchJob()
             } else {
                 flow {
                     emit(query)
                     delay(DELAY_SEARCH)
                 }
+                    .cancellable()
+                    .onStart {
+                        if (simpleDetailsJob.isActive) {
+                            cancelSimpleDetailsJob()
+                        }
+                    }
                     .debounce(DELAY_SEARCH)
-                    .collect {
-                        val searchList = getCoinListBySearchUseCase(it)
+                    .collect { query ->
+                        val searchList = getCoinListBySearchUseCase(query)
 
                         _searchViewState.value = when {
-                            searchList.isEmpty() -> SearchViewState.NoItems
-                            else -> SearchViewState.Global(globalSearchList = searchList)
+                            searchList.isNotEmpty() ->
+                                SearchViewState.Global(globalSearchList = searchList)
+                            else -> SearchViewState.NoItems
                         }
                     }
             }
@@ -154,13 +201,41 @@ class CoinViewModel @Inject constructor(
     private fun saveCoinToCache(coin: Coin) {
         cancelRecentSearchJob()
         viewModelScope.launch {
-            saveCoinToCacheUseCase(coin)
+            val currentTime = DateTime.now()
+            saveSearchCoinToCacheUseCase(coin, currentTime)
         }
     }
 
     private fun deleteSearchList() {
         viewModelScope.launch {
             clearSearchListUseCase()
+        }
+    }
+
+    private fun addToFavorite(coin: Coin) {
+        viewModelScope.launch {
+            val currentTime = DateTime.now()
+            addToFavoriteUseCase(coin, currentTime)
+        }
+    }
+
+    private fun showFavoriteList() {
+        viewModelScope.launch {
+            getFavoriteListUseCase()
+                .cancellable()
+                .collect { favoriteList ->
+                    when {
+                        favoriteList.isNotEmpty() -> _favoriteListViewState.value =
+                            FavoriteViewState.Display(favoriteCoinList = favoriteList)
+                        else -> _favoriteListViewState.value = FavoriteViewState.Hide
+                    }
+                }
+        }
+    }
+
+    private fun clearFavoriteList() {
+        viewModelScope.launch {
+            clearFavoriteListUseCase()
         }
     }
 

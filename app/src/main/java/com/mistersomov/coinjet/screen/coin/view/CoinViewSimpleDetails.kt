@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 fun CoinViewSimpleDetails(
     modifier: Modifier = Modifier,
     coin: Coin,
+    onAddToFavorite: () -> Unit,
     onCancelClicked: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -62,7 +63,7 @@ fun CoinViewSimpleDetails(
 
             }
             Text(
-                text = coin.fullName,
+                text = coin.name,
                 style = CoinJetTheme.typography.titleLarge,
                 color = CoinJetTheme.colors.onPrimary
             )
@@ -73,6 +74,7 @@ fun CoinViewSimpleDetails(
                         else -> R.drawable.favorite_outline
                     }
                 }
+                onAddToFavorite.invoke()
             }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = favoriteIconId.value),
@@ -110,7 +112,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.high24Hour.formatCurrencyToDisplay(),
+                    text = coin.priceUsd.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -123,7 +125,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.low24Hour.formatCurrencyToDisplay(),
+                    text = coin.priceUsd.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -144,7 +146,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.open24Hour.formatCurrencyToDisplay(),
+                    text = coin.priceUsd.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -157,7 +159,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.mktCap.formatBigDecimalsToDisplay(),
+                    text = coin.marketCapUsd.formatBigDecimalsToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -181,7 +183,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.volume24Hour.formatBigDecimalsToDisplay(),
+                    text = coin.volumeUsd24Hr.formatBigDecimalsToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -197,7 +199,7 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.volume24hourTo.formatBigDecimalsToDisplay(),
+                    text = coin.volumeUsd24Hr.formatBigDecimalsToDisplay(),
                     style = CoinJetTheme.typography.titleMedium,
                     color = CoinJetTheme.colors.onPrimary
                 )
@@ -221,10 +223,10 @@ fun CoinViewSimpleDetails(
                     color = CoinJetTheme.colors.primaryContainer
                 )
                 Text(
-                    text = coin.price.formatCurrencyToDisplay(),
+                    text = coin.priceUsd.formatCurrencyToDisplay(),
                     style = CoinJetTheme.typography.headlineMedium,
                     color = animateDigitColor(
-                        digit = coin.price,
+                        digit = coin.priceUsd,
                         initialColor = CoinJetTheme.colors.onPrimary
                     )
                 )

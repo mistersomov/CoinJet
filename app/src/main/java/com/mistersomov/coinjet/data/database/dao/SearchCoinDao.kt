@@ -4,18 +4,18 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.mistersomov.coinjet.data.database.entity.SearchCoinEntity
+import com.mistersomov.coinjet.data.database.entity.SearchCoinDbModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SearchCoinDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertByEntity(entity: SearchCoinEntity)
+    suspend fun insertByEntity(entity: SearchCoinDbModel)
 
-    @Query("SELECT * from ${SearchCoinEntity.TABLE_SEARCH_COIN_NAME} ORDER BY mktCap DESC")
-    fun getAll(): Flow<List<SearchCoinEntity>>
+    @Query("SELECT * from ${SearchCoinDbModel.TABLE_SEARCH_COIN_NAME}")
+    fun getAll(): Flow<List<SearchCoinDbModel>>
 
-    @Query("DELETE from ${SearchCoinEntity.TABLE_SEARCH_COIN_NAME}")
+    @Query("DELETE from ${SearchCoinDbModel.TABLE_SEARCH_COIN_NAME}")
     suspend fun deleteAll()
 }

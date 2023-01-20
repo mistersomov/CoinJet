@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
-import com.mistersomov.coinjet.screen.coin.model.SearchViewState
+import com.mistersomov.coinjet.screen.coin.model.search.SearchViewState
 
 @Composable
 fun SearchViewRecent(
@@ -37,7 +37,7 @@ fun SearchViewRecent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(id = R.string.crypto_search_headline_title_recent_searches),
+                text = stringResource(id = R.string.coin_search_headline_title_recent_searches),
                 color = CoinJetTheme.colors.surfaceVariant,
                 style = CoinJetTheme.typography.titleMedium
             )
@@ -46,7 +46,7 @@ fun SearchViewRecent(
                 shape = RoundedCornerShape(24.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.crypto_search_clear_cache),
+                    text = stringResource(id = R.string.coin_search_clear_cache),
                     color = CoinJetTheme.colors.onPrimary
                 )
             }

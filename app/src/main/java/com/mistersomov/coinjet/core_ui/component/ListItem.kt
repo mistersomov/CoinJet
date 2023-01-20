@@ -52,6 +52,7 @@ fun ListItem(
                     contentDescription = null,
                     tint = CoinJetTheme.colors.yellow
                 )
+                Spacer(modifier = Modifier.width(6.dp))
             }
             content.invoke()
         }

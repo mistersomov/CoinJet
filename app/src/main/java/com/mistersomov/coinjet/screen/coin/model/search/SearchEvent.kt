@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.model
+package com.mistersomov.coinjet.screen.coin.model.search
 
 import com.mistersomov.coinjet.domain.model.Coin
 

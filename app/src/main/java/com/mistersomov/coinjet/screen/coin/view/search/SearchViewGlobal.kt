@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
-import com.mistersomov.coinjet.screen.coin.model.SearchViewState
+import com.mistersomov.coinjet.screen.coin.model.search.SearchViewState
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -39,7 +39,7 @@ fun SearchViewGlobal(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(id = R.string.crypto_search_headline_title),
+            text = stringResource(id = R.string.coin_search_headline_title),
             color = CoinJetTheme.colors.surfaceVariant,
             style = CoinJetTheme.typography.titleMedium
         )

@@ -2,11 +2,11 @@ object Config {
     const val compileSdk = 33
     const val minSDK = 26
     const val targetSDK = 33
-    const val versionCode = 3
-    const val versionName = "0.1.2"
+    const val versionCode = 4
+    const val versionName = "0.1.3"
     const val packageName = "com.mistersomov.coinjet"
 
-    const val cryptoBaseUrl = "https://min-api.cryptocompare.com"
-    const val apiKey = "Apikey 2907b3513ceb60794d4852316529423e6315a7d0f2363150caf054aaf22c51d5"
-    const val cryptoBaseImageUrl = "https://www.cryptocompare.com"
+    const val cryptoBaseUrl = "https://api.coincap.io"
+    const val apiKey = "Bearer 27ade597-b24e-476f-a8e6-501e8be4d88c"
+    const val cryptoBaseImageUrl = "https://assets.coincap.io"
 }

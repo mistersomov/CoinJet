@@ -23,7 +23,7 @@ fun SearchViewFirst() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(id = R.string.crypto_search_headline_title),
+            text = stringResource(id = R.string.coin_search_headline_title),
             color = CoinJetTheme.colors.surfaceVariant,
             style = CoinJetTheme.typography.titleMedium
         )
@@ -37,7 +37,7 @@ fun SearchViewFirst() {
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .align(Alignment.CenterHorizontally),
-            text = stringResource(id = R.string.crypto_search_headline_title_first_search),
+            text = stringResource(id = R.string.coin_search_headline_title_first_search),
             color = CoinJetTheme.colors.surfaceVariant,
             style = CoinJetTheme.typography.titleSmall
         )
