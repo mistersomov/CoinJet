@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 fun Search(
     modifier: Modifier = Modifier,
     placeholderText: String?,
+    isAvailable: Boolean,
     onFocusChanged: () -> Unit,
     onValueChanged: (String) -> Unit,
     onCancelClicked: () -> Unit,
@@ -48,106 +49,102 @@ fun Search(
     val pattern = remember { Regex("[a-zA-z#\\s]*") }
     val maxChar = 12
 
-    Column(
+    Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                modifier = Modifier
-                    .weight(weight = if (!isExpanded.value) 0.5f else 1f)
-                    .onFocusChanged {
+        TextField(
+            modifier = Modifier
+                .weight(weight = if (!isExpanded.value) 0.5f else 1f)
+                .onFocusChanged {
+                    if (isAvailable) {
                         if (it.isFocused) {
                             isExpanded.value = true
                             onFocusChanged.invoke()
                         }
-                    },
-                value = text.value,
-                onValueChange = {
-                    scope.launch {
-                        isExpanded.value = true
-                        if (it.matches(pattern)) {
-                            text.value = it.take(maxChar)
-                        }
-                        onValueChanged.invoke(it)
                     }
                 },
-                placeholder = {
-                    if (!placeholderText.isNullOrBlank()) {
-                        Text(text = placeholderText)
+            value = text.value,
+            onValueChange = {
+                scope.launch {
+                    isExpanded.value = true
+                    if (it.matches(pattern)) {
+                        text.value = it.take(maxChar)
                     }
-                },
-                leadingIcon = {
+                    onValueChanged.invoke(it)
+                }
+            },
+            placeholder = {
+                if (!placeholderText.isNullOrBlank()) {
+                    Text(text = placeholderText)
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.search),
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                AnimatedVisibility(visible = isExpanded.value) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.search),
-                        contentDescription = null
-                    )
-                },
-                trailingIcon = {
-                    AnimatedVisibility(visible = isExpanded.value) {
-                        Icon(
-                            modifier = Modifier.clickable(interactionSource = remember {
-                                MutableInteractionSource()
-                            },
-                                indication = null,
-                                onClick = {
-                                    scope.launch {
-                                        text.value = ""
-                                        onRemoveQuery.invoke()
-                                    }
-                                }
-                            ),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.close_circle),
-                            contentDescription = null
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = with(CoinJetTheme.colors) {
-                    TextFieldDefaults.textFieldColors(
-                        backgroundColor = surfaceVariant,
-                        cursorColor = primary,
-                        errorCursorColor = error,
-                        focusedIndicatorColor = Color.Unspecified,
-                        unfocusedIndicatorColor = Color.Unspecified,
-                        leadingIconColor = onSurfaceVariant,
-                        trailingIconColor = onSurfaceVariant,
-                        errorTrailingIconColor = error,
-                        focusedLabelColor = primary,
-                        unfocusedLabelColor = onSurface.copy(ContentAlpha.medium),
-                        errorLabelColor = error,
-                        placeholderColor = onSurface.copy(ContentAlpha.medium),
-                    )
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
-            )
-            AnimatedVisibility(visible = isExpanded.value) {
-                Text(
-                    modifier = Modifier
-                        .padding(start = 12.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
+                        modifier = Modifier.clickable(interactionSource = remember {
+                            MutableInteractionSource()
+                        },
                             indication = null,
                             onClick = {
                                 scope.launch {
                                     text.value = ""
-                                    focusManager.clearFocus(force = true)
-                                    onCancelClicked.invoke()
-                                    isExpanded.value = false
+                                    onRemoveQuery.invoke()
                                 }
                             }
                         ),
-                    text = stringResource(id = R.string.cancel),
-                    style = CoinJetTheme.typography.titleMedium,
-                    color = CoinJetTheme.colors.onPrimary
+                        imageVector = ImageVector.vectorResource(id = R.drawable.close_circle),
+                        contentDescription = null
+                    )
+                }
+            },
+            shape = RoundedCornerShape(24.dp),
+            colors = with(CoinJetTheme.colors) {
+                TextFieldDefaults.textFieldColors(
+                    backgroundColor = surfaceVariant,
+                    cursorColor = primary,
+                    errorCursorColor = error,
+                    focusedIndicatorColor = Color.Unspecified,
+                    unfocusedIndicatorColor = Color.Unspecified,
+                    leadingIconColor = onSurfaceVariant,
+                    trailingIconColor = onSurfaceVariant,
+                    errorTrailingIconColor = error,
+                    focusedLabelColor = primary,
+                    unfocusedLabelColor = onSurface.copy(ContentAlpha.medium),
+                    errorLabelColor = error,
+                    placeholderColor = onSurface.copy(ContentAlpha.medium),
                 )
-            }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+        )
+        AnimatedVisibility(visible = isExpanded.value) {
+            Text(
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            scope.launch {
+                                text.value = ""
+                                focusManager.clearFocus(force = true)
+                                onCancelClicked.invoke()
+                                isExpanded.value = false
+                            }
+                        }
+                    ),
+                text = stringResource(id = R.string.cancel),
+                style = CoinJetTheme.typography.titleMedium,
+                color = CoinJetTheme.colors.primary
+            )
         }
     }
 }
@@ -158,6 +155,7 @@ fun PreviewSearch() {
     MainTheme() {
         Search(
             placeholderText = "ETHEREUM, BTC",
+            isAvailable = false,
             onFocusChanged = {},
             onValueChanged = {},
             onCancelClicked = {},

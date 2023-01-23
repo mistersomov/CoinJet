@@ -17,6 +17,6 @@ class CoinProtocolInterceptor @Inject constructor() : Interceptor {
 
     companion object {
         //Headers
-        private const val HEADER_API_KEY_NAME = "authorization"
+        private const val HEADER_API_KEY_NAME = "Authorization"
     }
 }

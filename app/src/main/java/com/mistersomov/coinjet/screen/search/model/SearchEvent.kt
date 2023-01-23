@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.model
+package com.mistersomov.coinjet.screen.search.model
 
 import com.mistersomov.coinjet.domain.model.Coin
 
@@ -8,9 +8,9 @@ sealed class SearchEvent {
 
     object ShowRecentSearch : SearchEvent()
 
-    data class LaunchSearch(val query: String) : SearchEvent()
+    data class StartSearching(val query: String) : SearchEvent()
 
-    data class Save(val coin: Coin) : SearchEvent()
+    data class Click(val coin: Coin) : SearchEvent()
 
     object ClearCache : SearchEvent()
 }

@@ -4,5 +4,9 @@ sealed class CoinEvent {
 
     object FetchData : CoinEvent()
 
-    data class Click(val id: String) : CoinEvent()
+    data class CoinClick(val id: String) : CoinEvent()
+
+    object SimpleDetailsClose: CoinEvent()
+
+    object SearchClick : CoinEvent()
 }

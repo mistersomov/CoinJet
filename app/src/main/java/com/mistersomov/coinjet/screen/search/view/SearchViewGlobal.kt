@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.view.search
+package com.mistersomov.coinjet.screen.search.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -15,13 +15,14 @@ import androidx.compose.ui.unit.dp
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
-import com.mistersomov.coinjet.screen.coin.model.SearchViewState
+import com.mistersomov.coinjet.screen.search.SearchCoinDetails
+import com.mistersomov.coinjet.screen.search.model.SearchViewState
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchViewGlobal(
-    viewState: SearchViewState.Global,
+    viewState: SearchViewState,
     onItemClicked: (Coin) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -40,14 +41,14 @@ fun SearchViewGlobal(
     ) {
         Text(
             text = stringResource(id = R.string.crypto_search_headline_title),
-            color = CoinJetTheme.colors.surfaceVariant,
+            color = CoinJetTheme.colors.onSurface,
             style = CoinJetTheme.typography.titleMedium
         )
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 6.dp),
-            color = CoinJetTheme.colors.surfaceVariant
+            color = CoinJetTheme.colors.outline
         )
         LazyColumn(
             state = listState,

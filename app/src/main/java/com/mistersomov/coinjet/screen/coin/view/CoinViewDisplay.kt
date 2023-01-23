@@ -8,17 +8,20 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -33,11 +36,11 @@ import com.mistersomov.coinjet.utils.formatCurrencyToDisplay
 
 @Composable
 fun CoinViewDisplay(
-    viewState: CoinViewState.Display,
+    viewState: CoinViewState,
     navController: NavController,
     onCoinClicked: (String) -> Unit,
 ) {
-    val coinList = viewState.coinList
+    val coinList = remember { viewState.coinList }
     val listState = rememberLazyListState()
 
     LazyColumn(
@@ -136,6 +139,7 @@ fun CoinDetails(coin: Coin) {
                 )
             }
             Column(
+                modifier = Modifier.fillMaxWidth(0.4f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
@@ -170,11 +174,15 @@ fun PercentChanging(
 
     Box(
         modifier = modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(6.dp)
-            )
-            .size(width = 60.dp, height = 24.dp),
+            .fillMaxSize()
+            .drawWithCache {
+                onDrawBehind {
+                    drawRoundRect(
+                        color = backgroundColor,
+                        cornerRadius = CornerRadius(6f, 6f)
+                    )
+                }
+            },
         contentAlignment = Alignment.Center
     ) {
         Text(

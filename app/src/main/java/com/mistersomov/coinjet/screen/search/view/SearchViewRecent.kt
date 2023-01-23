@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.view.search
+package com.mistersomov.coinjet.screen.search.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +15,12 @@ import androidx.compose.ui.unit.dp
 import com.mistersomov.coinjet.R
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.domain.model.Coin
-import com.mistersomov.coinjet.screen.coin.model.SearchViewState
+import com.mistersomov.coinjet.screen.search.SearchCoinDetails
+import com.mistersomov.coinjet.screen.search.model.SearchViewState
 
 @Composable
 fun SearchViewRecent(
-    viewState: SearchViewState.Recent,
+    viewState: SearchViewState,
     onItemClicked: (Coin) -> Unit,
     onClearClicked: () -> Unit,
 ) {
@@ -38,7 +39,7 @@ fun SearchViewRecent(
         ) {
             Text(
                 text = stringResource(id = R.string.crypto_search_headline_title_recent_searches),
-                color = CoinJetTheme.colors.surfaceVariant,
+                color = CoinJetTheme.colors.onSurface,
                 style = CoinJetTheme.typography.titleMedium
             )
             TextButton(
@@ -47,7 +48,7 @@ fun SearchViewRecent(
             ) {
                 Text(
                     text = stringResource(id = R.string.crypto_search_clear_cache),
-                    color = CoinJetTheme.colors.onPrimary
+                    color = CoinJetTheme.colors.primary
                 )
             }
         }

@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mistersomov.coinjet.core_ui.CoinJetTheme
 import com.mistersomov.coinjet.core_ui.MainTheme
+import com.mistersomov.coinjet.navigation.NavigationGraph
 import com.mistersomov.coinjet.screen.coin.CoinScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,9 +27,7 @@ class MainActivity : ComponentActivity() {
             MainTheme {
                 SetOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 SetSystemUiController()
-                val navController = rememberNavController()
-
-                CoinScreen(navController = navController)
+                NavigationGraph()
             }
         }
     }

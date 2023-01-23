@@ -1,4 +1,4 @@
-package com.mistersomov.coinjet.screen.coin.view.search
+package com.mistersomov.coinjet.screen.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -45,7 +45,7 @@ fun SearchCoinDetails(
         Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = coin?.name ?: "",
-            color = CoinJetTheme.colors.onPrimary,
+            color = CoinJetTheme.colors.onSurface,
             style = CoinJetTheme.typography.titleMedium,
         )
     }
